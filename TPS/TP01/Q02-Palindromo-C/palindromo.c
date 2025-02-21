@@ -35,6 +35,7 @@
  *	return fim;
 }*
  */
+
 bool ehPalindromo(wchar_t str[]) {
 	bool palindromo = true;
 	int i = 0,
@@ -59,7 +60,7 @@ int main() {
 	str[wcscspn(str, L"\n")] = L'\0';
 	
 
-	while (!wcscmp(str, L"FIM")) {
+	while (wcscmp(str, L"FIM")) {
 		if (ehPalindromo(str)) {
 			wprintf(L"SIM\n");
 		}

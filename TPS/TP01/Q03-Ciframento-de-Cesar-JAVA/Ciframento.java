@@ -22,11 +22,16 @@ public class Ciframento {
 	public static String textbf(String str) {
 		String cifra = "";
 
-		for (int i=0; i < str.length(); i++){
+		for (int i=0; i < str.length(); i++) {
+
+			//verifica se a letra ou numero não é um caracter especial
 			if(str.charAt(i) < 127) { 
+
+				//concatenar os chars
 				cifra += (char) (str.charAt(i) + 3);
 			} 
 			else {
+				//se for um caracter especial ele printa ele mesmo
 				cifra += str.charAt(i);
 			}
 		}
