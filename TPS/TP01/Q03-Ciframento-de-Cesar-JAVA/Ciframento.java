@@ -23,21 +23,26 @@ public class Ciframento {
 		String cifra = "";
 
 		for (int i=0; i < str.length(); i++){
-			cifra += (char) (str.charAt(i) + 3);
+			if(str.charAt(i) < 127) { 
+				cifra += (char) (str.charAt(i) + 3);
+			} 
+			else {
+				cifra += str.charAt(i);
+			}
 		}
 
-		return cifra;
+		return new String(cifra);
 	}
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 
 		String str;
-		str = sc.nextLine().trim();
+		str = sc.nextLine();
 
 		while (!verificaFim(str, "FIM")) {
 			System.out.println(textbf(str));
-			str = sc.nextLine().trim();	
+			str = sc.nextLine();	
 		}
 
 		sc.close();
