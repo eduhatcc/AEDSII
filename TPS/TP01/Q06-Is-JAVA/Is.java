@@ -21,11 +21,10 @@ public class Is {
 
 	public static boolean isVogal(String str) {
 		boolean vogal = true;
-		str = str.toUpperCase();
 
 		//repetição para verificar se faz parte das vogais com base na tabela ASCII
 		for (int i=0; i < str.length(); i++) {
-			if (str.charAt(i) != 65 &&  str.charAt(i) != 69 && str.charAt(i) != 73 && str.charAt(i) != 79 && str.charAt(i) != 85) {
+			if (str.charAt(i) !=97 && str.charAt(i) != 101 && str.charAt(i) != 105 && str.charAt(i) != 111 && str.charAt(i) != 117 && str.charAt(i) != 65 && str.charAt(i) != 69 && str.charAt(i) != 73 && str.charAt(i) != 79 && str.charAt(i) != 85) {
 				vogal = false;
 				i = str.length();
 			}
@@ -37,11 +36,10 @@ public class Is {
 
 	public static boolean isConsoante(String str) {
 		boolean consoante = true;
-		str = str.toUpperCase();
 
 		//repetição para verificar se faz parte das vogais com base na tabela ASCII
 		for (int i=0; i < str.length(); i++) {
-			if (str.charAt(i) < 66 || str.charAt(i) == 69 || str.charAt(i) == 73 || str.charAt(i) == 79 || str.charAt(i) == 85 || str.charAt(i) > 90) {
+			if (str.charAt(i) < 66 || str.charAt(i) == 69 || str.charAt(i) == 73 || str.charAt(i) == 79 || str.charAt(i) == 85 || str.charAt(i) > 90 && str.charAt(i) < 97 || str.charAt(i) == 97 || str.charAt(i) == 101 || str.charAt(i) == 105 || str.charAt(i) == 111 || str.charAt(i) == 117) {
 				consoante = false;
 				i = str.length();
 			}	
@@ -65,14 +63,38 @@ public class Is {
 	}
 
 	public static boolean isReal(String str) {
-		boolean ehReal = false;
+		boolean ehReal = true;
+		boolean soInt = false;
+		int cont = 0;
 
 		for (int i=0; i < str.length(); i++) {
-			if (str.charAt(i) < 48 && str.charAt(i) > 57) {
+
+			// faz a comparação de acordo com a tabela ASCII
+			if (str.charAt(i) >= 44 && str.charAt(i) <= 57) {
+				if (str.charAt(i) == 44 || str.charAt(i) == 46) {
+
+					//se possui ponto ou vírgula irá contabilizar no contador
+					cont++;
+				}
+
+				//se possuir mais de um ponto ou vírgula não será um conjunto de números reais
+				if (cont > 1) {
+					ehReal = false;
+					i = str.length();
+				}	
+			}	
+			else {
+				ehReal = false;
 				i = str.length();
 			}
-			else if (str.charAt(i) == 46 || str.charAt(i) == 44) {
-			       ehReal = true;	
+		}
+
+		if (cont == 0) {
+
+			//se o contador estiver zerado ele verifica se possui apenas números inteiros na string
+			if (!isInt(str)) {
+				//se não possuir apenas números inteiros, então será falso para número reais
+				ehReal = false;
 			}
 		}
 
@@ -87,7 +109,7 @@ public class Is {
 			System.out.printf(isVogal(str) ? "SIM " : "NAO ");
 			System.out.printf(isConsoante(str) ? "SIM " : "NAO ");
 			System.out.printf(isInt(str) ? "SIM " : "NAO ");
-			System.out.printf(isReal(str) ? "SIM %n" : "NAO %n");
+			System.out.printf(isReal(str) ? "SIM%n" : "NAO%n");
 
 			str = sc.nextLine();
 		}
