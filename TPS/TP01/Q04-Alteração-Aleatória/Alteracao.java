@@ -23,7 +23,8 @@ public class Alteracao {
 		StringBuilder newStr = new StringBuilder(str);
 
 		char rand0 = (char) ('a' + (Math.abs(gerador.nextInt()) % 26));
-		char rand1 = (char) ('a' + (Math.abs(gerador.nextInt()) % 26));		
+		char rand1 = (char) ('a' + (Math.abs(gerador.nextInt()) % 26));
+
 		/*
 		 * while (rand0 == rand1) {
 		 *	rand1 = (char) ('a' + (Math.abs(gerador.nextInt()) % 26));
