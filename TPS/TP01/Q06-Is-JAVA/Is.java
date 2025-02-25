@@ -25,7 +25,7 @@ public class Is {
 
 		//repetição para verificar se faz parte das vogais com base na tabela ASCII
 		for (int i=0; i < str.length(); i++) {
-			if (str.charAt(i) != 65 || str.charAt(i) != 69 || str.charAt(i) != 73 || str.charAt(i) != 79 || str.charAt(i) != 85) {
+			if (str.charAt(i) != 65 &&  str.charAt(i) != 69 && str.charAt(i) != 73 && str.charAt(i) != 79 && str.charAt(i) != 85) {
 				vogal = false;
 				i = str.length();
 			}
@@ -64,15 +64,20 @@ public class Is {
 		return ehInt;
 	}
 
-	/*
 	public static boolean isReal(String str) {
-		boolean ehReal = true;
+		boolean ehReal = false;
 
-		
+		for (int i=0; i < str.length(); i++) {
+			if (str.charAt(i) < 48 && str.charAt(i) > 57) {
+				i = str.length();
+			}
+			else if (str.charAt(i) == 46 || str.charAt(i) == 44) {
+			       ehReal = true;	
+			}
+		}
 
 		return ehReal;
 	}
-	*/
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
@@ -82,7 +87,7 @@ public class Is {
 			System.out.printf(isVogal(str) ? "SIM " : "NAO ");
 			System.out.printf(isConsoante(str) ? "SIM " : "NAO ");
 			System.out.printf(isInt(str) ? "SIM " : "NAO ");
-			//System.out.ptintf(isReal(str) ? "SIM " : "NAO %n");
+			System.out.printf(isReal(str) ? "SIM %n" : "NAO %n");
 
 			str = sc.nextLine();
 		}
