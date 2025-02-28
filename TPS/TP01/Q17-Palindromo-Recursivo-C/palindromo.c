@@ -5,36 +5,35 @@
 #include <wchar.h>
 #include <string.h>
 
-bool ehPalindromo(wchar_t str[], int i, int j) {
-	bool palindromo = true;
+bool ehPalindromo(char str[], int i, int j) {
+	bool palindromo = false;
 
-	if (i < j) {
-		if (str[i] != str[j]) {
-			palindromo = false;
-		}
-		else {
-			palindromo = ehPalindromo(str, i+1, j-1);
-		}
+	if (i >= j) {
+		palindromo = true;
 	}
+	else if (str[i] == str[j]) {
+		palindromo = ehPalindromo(str, i+1, j-1);
+		}
 
 	return palindromo;
 }
 
 int main() {
 	setlocale(LC_ALL, "");
-	wchar_t str[100];
-	fgetws(str, sizeof(str) / sizeof(wchar_t), stdin);
-	str[wcscspn(str, L"\n")] = L'\0';
+	char str[100];
+	fgets(str, sizeof(str), stdin);
+	str[strcspn(str, "\n")] = '\0';
 	
-	while (wcscmp(str, L"FIM")) {
-		if (ehPalindromo(str, 0, (wcslen(str) - 1))) {
-			wprintf(L"SIM\n");
+	while (strcmp(str, "FIM")) {
+		int TAM = strlen(str);
+		if (ehPalindromo(str, 0, TAM - 1)) {
+			printf("SIM\n");
 		}
 		else {
-			wprintf(L"NAO\n");
+			printf("NAO\n");
 		}
-		fgetws(str, sizeof(str) / sizeof(wchar_t), stdin);
-		str[wcscspn(str, L"\n")] = L'\0';
+		fgets(str, sizeof(str), stdin);
+		str[strcspn(str, "\n")] = '\0';
 	}
 
 	return 0;
