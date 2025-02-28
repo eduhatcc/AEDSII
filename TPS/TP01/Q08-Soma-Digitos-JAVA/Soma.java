@@ -2,28 +2,32 @@ import java.util.Scanner;
 
 public class Soma {
 
-	public static boolean verificaFim(String str, String chave) {
-		boolean fim = false;
+	public static boolean verificaFim(String str, String chave, int i) {
+		boolean fim = true;
 
-		if (str.length() == chave.length()) {
-			fim = true;
-
-			for (int i=0; i < chave.length(); i++) {
+		if (i < chave.length()) {
+			if (str.length() == chave.length()) {
 				if (str.charAt(i) != chave.charAt(i)) {
 					fim = false;
-					i = chave.length();
+				}
+				else {
+					fim = verificaFim(str, chave, i+1);
 				}
 			}
+			else { 
+				fim = false;
+			}
 		}
-
 		return fim;
 	}
 
 	public static int somaDigitos(String str, int i) {
 		int soma = 0;
-
-		if (i >= 0) {
-			soma = str.charAt(i);			
+		
+		if (i < str.length()) {
+			char n = str.charAt(i);
+			soma = (n - '0');
+			soma += somaDigitos(str, i+1);
 		}
 
 		return soma;
@@ -33,8 +37,8 @@ public class Soma {
 		Scanner sc = new Scanner(System.in);
 		String str = sc.nextLine();
 
-		while (!verificaFim(str, "FIM")) {
-			System.out.println(somaDigitos(str, (str.length() - 1)));
+		while (!verificaFim(str, "FIM", 0)) {
+			System.out.println(somaDigitos(str, 0));
 			str = sc.nextLine();
 		}
 
