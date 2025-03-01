@@ -2,19 +2,30 @@ import java.util.Scanner;
 
 public class Is {
 
+	/* 
+	 * FUNÇÃO VERIFICA FIM RECURSIVA
+	 */
 	public static boolean verificaFim(String str, String chave, int i) {
 		boolean fim = true;
 
+		// condição de parada
 		if (i < chave.length()) {
+
+			// verifica se o tamanho das strings são iguais
 			if (str.length() == chave.length()) {
+				
+				// verifica se os caracteres são diferentes 
 				if (str.charAt(i) != chave.charAt(i)) {
+					// se sim, retorna falso
 					fim = false;
 				}
 				else {
+					// se não, continua chamando recursivamente
 					fim = verificaFim(str, chave, i+1);
 				}
 			}
 			else {
+				// se o tamanho das strings forem diferentes retorna falso
 				fim = false;
 			}
 		}
@@ -22,6 +33,16 @@ public class Is {
 		return fim;
 	}
 
+	/*
+	 * FUNÇÃO VERIFICA FIM BASE QUE CHAMA A FUNÇÃO RECURSIVA
+	 */ 
+	public static boolean verificaFim(String str) {
+		return verificaFim(str, "FIM", 0);
+	}
+
+	/*
+	 * FUNÇÃO IS VOGAL RECURSIVA
+	 */
 	public static boolean isVogal(String str, int i, int j) {
 		boolean vogal = true;
 
@@ -40,6 +61,16 @@ public class Is {
 
 	}
 
+	/*
+	 * FUNÇÃO IS VOGAL BASE QUE CHAMA A FUNÇÃO RECURSIVA
+	 */
+	public static boolean isVogal(String str) {
+		return isVogal(str, 0, str.length());
+	}
+
+	/*
+	 * FUNÇÃO IS CONSOANTE RECURSIVA
+	 */
 	public static boolean isConsoante(String str, int i, int j) {
 		boolean consoante = true;
 
@@ -57,6 +88,16 @@ public class Is {
 		return consoante;
 	}
 
+	/*
+	 * FUNÇÃO IS CONSOANTE BASE QUE CHAMA A RECURSIVA
+	 */
+	public static boolean isConsoante(String str) {
+		return isConsoante(str, 0, str.length());
+	}
+
+	/*
+	 * FUNÇÃO IS INT RECURSIVA
+	 */
 	public static boolean isInt(String str, int i, int j) {
 		boolean ehInt = true;
 		
@@ -74,6 +115,16 @@ public class Is {
 		return ehInt;
 	}
 
+	/*
+        * FUNÇÃO IS INT BASE QUE CHAMA A FUNÇÃO RECURSIVA
+        */
+        public static boolean isInt(String str) {
+		return isInt(str, 0, str.length());
+        }
+
+	/*
+	 * FUNÇÃO IS REAL RECURSIVA
+	 */
 	public static boolean isReal(String str, int cont, int i, int j) {
 		boolean ehReal = true;
 
@@ -104,7 +155,7 @@ public class Is {
 		if (cont == 0 && !ehReal) {
 
 			//se o contador estiver zerado ele verifica se possui apenas números inteiros na string
-			if (!isInt(str, 0, (str.length() -1))) {
+			if (!isInt(str)) {
 				//se não possuir apenas números inteiros, então será falso para número reais
 				ehReal = false;
 			}
@@ -113,15 +164,25 @@ public class Is {
 		return ehReal;
 	}
 
+	/*
+	 * FUNÇÃO IS REAL BASE QUE CHAMA A FUNÇÃO RECURSIVA
+	 */
+	public static boolean isReal(String str) {
+		return isReal(str, 0, 0, str.length());
+	}
+
+	/*
+	 * FUNÇÃO MAIN
+	 */
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		String str = sc.nextLine();
 		
-		while (!verificaFim(str, "FIM", 0)) {
-			System.out.printf(isVogal(str, 0, str.length()) ? "SIM " : "NAO ");
-			System.out.printf(isConsoante(str, 0, str.length()) ? "SIM " : "NAO ");
-			System.out.printf(isInt(str, 0, (str.length())) ? "SIM " : "NAO ");
-			System.out.printf(isReal(str, 0, 0, (str.length())) ? "SIM%n" : "NAO%n");
+		while (!verificaFim(str)) {
+			System.out.printf(isVogal(str) ? "SIM " : "NAO ");
+			System.out.printf(isConsoante(str) ? "SIM " : "NAO ");
+			System.out.printf(isInt(str) ? "SIM " : "NAO ");
+			System.out.printf(isReal(str) ? "SIM%n" : "NAO%n");
 
 			str = sc.nextLine();
 		}
