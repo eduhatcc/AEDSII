@@ -2,16 +2,33 @@ import java.util.Scanner;
 
 public class Anagrama {
 
-	public static boolean ehAnagrama(String str) {
-		boolean eh = false;
+	public static boolean verificaFim(String str, String chave) {
+		boolean fim = false;
 
-		for (int i=0; i < str.length(); i++) {
-			for (int j=i; j < str.length(); j++) {
+		if (str.length() == chave.length()) {
+			fim = true;
+
+			for (int i=0; i < chave.length(); i++) {
+				if (str.charAt(i) != chave.charAt(i)) {
+					fim = false;
+					i = chave.length();
+				}
+			}
+		}
+
+		return fim;
+	}
+
+	public static boolean ehAnagrama(String str) {
+		boolean eh = true;
+
+		for (int i=0; i < str.length()/2; i++) {
+			for (int j=i*2; j < str.length(); j++) {
 				if (str.charAt(i) == str.charAt(j)) {
-					eh = true;
 					j = str.length();
 				}
-				else if (j == (str.length() -1) {
+				else if (j >= str.length() -1) {
+					eh = false;
 				}
 			}
 		}
