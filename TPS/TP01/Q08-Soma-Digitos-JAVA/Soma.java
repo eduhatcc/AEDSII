@@ -26,7 +26,7 @@ public class Soma {
 		
 		if (i < str.length()) {
 			char n = str.charAt(i);
-			soma = (n - '0');
+			soma = (n - '0'); // transforma o char em número, sem considerar a tabela ascii
 			soma += somaDigitos(str, i+1);
 		}
 
