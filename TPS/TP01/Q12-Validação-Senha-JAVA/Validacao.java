@@ -83,7 +83,7 @@ public class Validacao {
 		String str = sc.nextLine().trim();
 
 		while (!verificaFim(str)) {
-			System.out.println((senhaValida(str)) ? "SIM" : "NÃO");
+			System.out.println((senhaValida(str)) ? "SIM" : "N\u00C3O");
 			str = sc.nextLine().trim();
 		}
 		       	
