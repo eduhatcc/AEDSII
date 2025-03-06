@@ -78,55 +78,55 @@ public class Pagina {
                         else if (html.charAt(j) == 'u') {
                                 u++;
                         }
-			else if (html.charAt(j) == 'á') {
+			else if (html.charAt(j) == '\u00e1') {
 				a0++;
 			} 
-			else if (html.charAt(j) == 'é') {
+			else if (html.charAt(j) == '\u00e9') {
 				e0++;
 			} 
-			else if (html.charAt(j) == 'í') {
+			else if (html.charAt(j) == '\u00ed') {
 				i0++;
 			} 
-			else if (html.charAt(j) == 'ó') {
+			else if (html.charAt(j) == '\u00f3') {
 				o0++;
-			} 
-			else if (html.charAt(j) == 'ú') {
+			}
+			else if (html.charAt(j) == '\u00fa') {
 				u0++;
 			} 
-			else if (html.charAt(j) == 'à') {
+			else if (html.charAt(j) == '\u00e0') {
 				a1++;
 			} 
-			else if (html.charAt(j) == 'è') {
+			else if (html.charAt(j) == '\u00e8') {
 				e1++;
 			} 
-			else if (html.charAt(j) == 'ì') {
+			else if (html.charAt(j) == '\u00ec') {
 				i1++;
 			} 
-			else if (html.charAt(j) == 'ò') {
+			else if (html.charAt(j) == '\u00f2') {
 				o1++;
 			} 
-			else if (html.charAt(j) == 'ù') {
+			else if (html.charAt(j) == '\u00f9') {
 				u1++;
 			} 
-			else if (html.charAt(j) == 'ã') {
+			else if (html.charAt(j) == '\u00e3') {
 				a2++;
 			} 
-			else if (html.charAt(j) == 'õ') {
+			else if (html.charAt(j) == '\u00f5') {
 				o2++;
 			} 
-			else if (html.charAt(j) == 'â') {
+			else if (html.charAt(j) == '\u00e2') {
 				a3++;
 			} 
-			else if (html.charAt(j) == 'ê') {
+			else if (html.charAt(j) == '\u00ea') {
 				e3++;
 			} 
-			else if (html.charAt(j) == 'î') {
+			else if (html.charAt(j) == '\u00ee') {
 				i3++;
 			} 
-			else if (html.charAt(j) == 'ô') {
+			else if (html.charAt(j) == '\u00f4') {
 				o3++;
 			}
-			else if (html.charAt(j) == 'û') {
+			else if (html.charAt(j) == '\u00fb') {
 				u3++;
 			} 
 			else if ((html.charAt(j) >= 'a' && html.charAt(j) <= 'z' || html.charAt(j) >= 'A' && html.charAt(j) <= 'Z') && html.charAt(j) != 'a' && html.charAt(j) != 'e' && html.charAt(j) != 'i' && html.charAt(j) != 'o' && html.charAt(j) != 'u' && html.charAt(j) != 'A' && html.charAt(j) != 'E' && html.charAt(j) != 'I' && html.charAt(j) != 'O' && html.charAt(j) != 'U') {
@@ -146,7 +146,7 @@ public class Pagina {
 			}
 		}
 
-		System.out.printf("a(%d) e(%d) i(%d) o(%d) u(%d) á(%d) é(%d) í(%d) ó(%d) ú(%d) à(%d) è(%d) ì(%d) ò(%d) ù(%d) ã(%d) õ(%d) â(%d) ê(%d) î(%d) ô(%d) û(%d) consoante(%d) <br>(%d) <table>(%d) %s%n", a, e, i, o, u, a0, e0, i0, o0, u0, a1, e1, i1, o1, u1, a2, o2, a3, e3, i3, o3, u3, consoante, br, table, str);
+		System.out.printf("a(%d) e(%d) i(%d) o(%d) u(%d) \u00e1(%d) \u00e9(%d) \u00ed(%d) \u00f3(%d) \u00fa(%d) \u00e0(%d) \u00e8(%d) \u00ec(%d) \u00f2(%d) \u00f9(%d) \u00e3(%d) \u00f5(%d) \u00e2(%d) \u00ea(%d) \u00ee(%d) \u00f4(%d) \u00fb(%d) consoante(%d) <br>(%d) <table>(%d) %s%n", a, e, i, o, u, a0, e0, i0, o0, u0, a1, e1, i1, o1, u1, a2, o2, a3, e3, i3, o3, u3, consoante, br, table, str);
          
 	}
 
