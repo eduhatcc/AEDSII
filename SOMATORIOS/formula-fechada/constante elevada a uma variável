@@ -1,0 +1,6 @@
+a1(r^n - 1)
+___________
+   r - 1
+
+a1 é o primeiro termo do somatório, ou seja, somatório de i=1 até n de 5^n = 5¹. 
+Então o termo a1 do somatório acima é igual a 5.
