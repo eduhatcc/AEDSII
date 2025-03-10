@@ -93,7 +93,7 @@ public class Anagrama {
 			sc.next();
 			str2 = sc.next();
 
-			System.out.println((ehAnagrama(str1, str2)) ? "SIM" : "N\u00C3O");
+ 			System.out.println((ehAnagrama(str1, str2)) ? "SIM" : "NAO");
 			str1 = sc.next();
 		}
 
