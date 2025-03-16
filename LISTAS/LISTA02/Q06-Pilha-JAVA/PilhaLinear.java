@@ -19,7 +19,7 @@ public class PilhaLinear {
 	 */
 	public void empilhar(int elem) {
 		if (n == max) {
-			System.out.println("ERRO! Pilha cheia!");
+			System.out.printf("%nERRO! Pilha cheia!%n");
 		}
 		else {
 			array[n] = elem;
@@ -30,11 +30,12 @@ public class PilhaLinear {
 	/*
 	 * FUNÇÃO DESEMPILHAR
 	 */
-	public int desempilhar(int elem) throws Exception {
+	public int desempilhar() throws Exception {
 		if (n == 0) 
 			throw new Exception("Pilha vazia!");
 		
-		int resp = array[--n];
+		int resp = array[n-1];
+		n--;
 		return resp;
 	}
 
@@ -114,11 +115,11 @@ public class PilhaLinear {
 				case 1: // Empilhar
 					System.out.printf("%nDigite o número: ");
 					elem = sc.nextInt();
-					empilhar(elem);
+					pilha.empilhar(elem);
 					break;
 				case 2: // Desempilhar
 					try {
-						System.out.printf("%nNúmero %d removido!", desempilhar());
+						System.out.printf("%nNúmero %d removido!%n", pilha.desempilhar());
 					}
 					catch (Exception e) {
 						System.out.printf("%nErro! %s%n", e.getMessage());
@@ -126,7 +127,7 @@ public class PilhaLinear {
 					break;
 				case 3: // Mostrar Pilha
 					try {
-						mostrar();
+						pilha.mostrar();
 					}
 					catch (Exception e) {
 						System.out.printf("%nErro! %s%n", e.getMessage());
@@ -136,7 +137,7 @@ public class PilhaLinear {
 					try {
 						System.out.printf("%nDigite o número: ");
 						elem = sc.nextInt();
-						if (pesquisar(elem)) {
+						if (pilha.pesquisar(elem)) {
 							System.out.printf("Número %d encontrado!", elem);
 						}
 						else {
