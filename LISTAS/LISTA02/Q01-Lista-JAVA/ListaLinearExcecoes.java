@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class ListaLinear {
+public class ListaLinearExcecoes {
 	// atributos da classe
 	int max;
 	int array[];
@@ -9,7 +9,7 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO CONSTRUTORA
 	 */
-	public ListaLinear(int max) {
+	public ListaLinearExcecoes(int max) {
 		this.max = max;
 		array = new int[max];
 		n = 0;
@@ -62,7 +62,10 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO RI - REMOVER INICIO
 	 */
-	public int removerInicio() {		
+	public int removerInicio() throws Exception {		
+		if (n == 0)
+			throw new Exception("Lista vazia!");
+
 		int resp = array[0];
 		for (int i = 0; i < n; i++) {
 			array[i] = array[i+1];
@@ -75,7 +78,10 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO RF - REMOVER FIM
 	 */
-	public int removerFim() {
+	public int removerFim() throws Exception {
+		if (n == 0) 
+			throw new Exception("Lista vazia!");
+
 		int resp = array[n-1];
 		n--;
 
@@ -85,7 +91,10 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO REMOVER NA POSIÇÃO DESEJADA
 	 */
-	public int remover(int pos) {
+	public int remover(int pos) throws Exception {
+		if (n == 0) 
+			throw new Exception("Lista vazia!");
+
 		int resp = 0;
 		resp = array[pos];
 
@@ -100,7 +109,10 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO MOSTRAR OS ELEMENTOS DA LISTA
 	 */
-	public void mostrar() {
+	public void mostrar() throws Exception {
+		if (n == 0) 
+			throw new Exception("Lista vazia!");
+
 		System.out.printf("%n");
 		for (int i = 0; i < n; i++) {
 			System.out.printf(" %d", array[i]);
@@ -111,7 +123,10 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO PESQUISAR ELEMENTO DA LISTA
 	 */
-	public boolean pesquisar(int elem) {
+	public boolean pesquisar(int elem) throws Exception {
+		if (n == 0)
+			throw new Exception("Lista vazia!");
+
 		boolean encontrou = false;
 
 		for (int i = 0; i < n; i++) {
@@ -136,7 +151,7 @@ public class ListaLinear {
 			}
 		} while (TAM <= 0);
 
-		ListaLinear lista = new ListaLinear(TAM);
+		ListaLinearExcecoes lista = new ListaLinearExcecoes(TAM);
 
 		int elem = 0,
 		    pos = 0,
@@ -190,35 +205,60 @@ public class ListaLinear {
 					lista.inserir(elem, pos-1);
 					break;
 				case 4: // RI - Remover Início
-					num = lista.removerInicio();
-					System.out.printf("%nNúmero %d removido!%n", num);	
+					try {
+						num = lista.removerInicio();
+						System.out.printf("%nNúmero %d removido!%n", num);
+					}
+					catch (Exception e) {
+						System.out.printf("%nErro! %s%n", e.getMessage());
+					}
 					break;
-				case 5:  // RF - Remover Fim
-					num = lista.removerFim();
-					System.out.printf("%nNúmero %d removido!%n", num);
+				case 5: // RF - Remover Fim
+					try {
+						num = lista.removerFim();
+						System.out.printf("%nNúmero %d removido!%n", num);
+					}
+					catch (Exception e) {
+						System.out.printf("%nErro! %s%n",e.getMessage());
+					}
 					break;
 				case 6: // R - Remover Posição Desejada
-					System.out.printf("%nDigite a posição desejada para remover [1 a %d]: ", TAM);
-					do {
-						pos = sc.nextInt();
-						if (pos < 0 || pos > TAM) {
-							System.out.printf("%nErro! Posição incompatível! Digite um numero maior que 0 e menor que %d: ", TAM);
-						}
-					} while (pos < 0 || pos > TAM);
-					num = lista.remover(pos-1);
-					System.out.printf("%nNúmero %d removido!%n", num);					
-					break;
-				case 7:  // Mostrar Lista
-					lista.mostrar();
-					break;
-				case 8:  // Pesquisar Número 
-					System.out.printf("%nDigite o número a ser pesquisado: ");
-					elem = sc.nextInt();
-					if (lista.pesquisar(elem)) {
-						System.out.printf("%nNúmero %d encontrado!%n", elem);
+					try {
+						System.out.printf("%nDigite a posição desejada para remover [1 a %d]: ", TAM);
+						do {
+							pos = sc.nextInt();
+							if (pos < 0 || pos > TAM) {
+								System.out.printf("%nErro! Posição incompatível! Digite um numero maior que 0 e menor que %d: ", TAM);
+							}
+						} while (pos < 0 || pos > TAM);
+						num = lista.remover(pos-1);
+						System.out.printf("%nNúmero %d removido!%n", num);
 					}
-					else {
-						System.out.printf("%nNúmero %d não encontrado!%n", elem);
+					catch (Exception e) {
+						System.out.printf("%nErro! %s%n", e.getMessage());
+					}					
+					break;
+				case 7: // Mostrar Lista
+					try {
+						lista.mostrar();
+					}
+					catch (Exception e) {
+						System.out.printf("%nErro! %s%n", e.getMessage());
+					}
+					break;
+				case 8: // Pesquisar Número 
+					try {
+						System.out.printf("%nDigite o número a ser pesquisado: ");
+						elem = sc.nextInt();
+						if (lista.pesquisar(elem)) {
+							System.out.printf("%nNúmero %d encontrado!%n", elem);
+						}
+						else {
+							System.out.printf("%nNúmero %d não encontrado!%n", elem);
+						}
+					}
+					catch (Exception e) {
+						System.out.printf("%nErro! %s%n", e.getMessage());
 					}
 					break;
 				default : // Caso base para erro 

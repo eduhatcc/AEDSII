@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class ListaLinear {
+public class ListaLinearCara {
 	// atributos da classe
 	int max;
 	int array[];
@@ -9,7 +9,7 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO CONSTRUTORA
 	 */
-	public ListaLinear(int max) {
+	public ListaLinearCara(int max) {
 		this.max = max;
 		array = new int[max];
 		n = 0;
@@ -50,6 +50,9 @@ public class ListaLinear {
 		if (n == max ) {
 			System.out.println("ERRO! Lista cheia!");
 		}
+		else if (pos > n) {
+			System.out.println("ERRO! Posição inexistente");
+		}
 		else {
 			for (int i = n; i > pos; i--) {
 				array[i] = array[i-1];
@@ -62,13 +65,13 @@ public class ListaLinear {
 	/*
 	 * FUNÇÃO RI - REMOVER INICIO
 	 */
-	public int removerInicio() {		
+	public int removerInicio() {
 		int resp = array[0];
 		for (int i = 0; i < n; i++) {
 			array[i] = array[i+1];
 		}	
 		n--;
-		
+
 		return resp;
 	}
 
@@ -76,7 +79,7 @@ public class ListaLinear {
 	 * FUNÇÃO RF - REMOVER FIM
 	 */
 	public int removerFim() {
-		int resp = array[n-1];
+		int resp = array[n];
 		n--;
 
 		return resp;
@@ -87,13 +90,16 @@ public class ListaLinear {
 	 */
 	public int remover(int pos) {
 		int resp = 0;
-		resp = array[pos];
-
-		for (int i = pos; i < n; i++) {
-			array[i] = array[i+1];
+		if (pos < 0 || pos > n) {
+			System.out.println("ERRO! Posição inválida!");
 		}
-		n--;
-
+		else {
+			resp = array[pos];
+			for (int i = pos; i < n; i++) {
+				array[i] = array[i+1];
+			}
+			n--;
+		}
 		return resp;
 	}
 
@@ -136,7 +142,7 @@ public class ListaLinear {
 			}
 		} while (TAM <= 0);
 
-		ListaLinear lista = new ListaLinear(TAM);
+		ListaLinear lista = new ListaLinearCara(TAM);
 
 		int elem = 0,
 		    pos = 0,
@@ -179,7 +185,7 @@ public class ListaLinear {
 					lista.inserirFim(elem); 
 					break;
 				case 3: // I - Inserir Posição Desejada
-					System.out.printf("%nDigite o número e a posição desejada [posição de 1 a %d]: ", TAM);
+					System.out.printf("%nDigite o número e a posição desejada [posição de: 1 a %d]", TAM);
 					elem = sc.nextInt();
 					do {
 						pos = sc.nextInt();
