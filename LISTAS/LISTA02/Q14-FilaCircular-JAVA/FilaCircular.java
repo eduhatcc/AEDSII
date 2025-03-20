@@ -61,6 +61,18 @@ public class FilaCircular {
 		System.out.printf("%n");
 	}
 
+	public void mostrarInvertido() throws Exception {
+		if (n == p) {
+			throw new Exception("Fila vazia!");
+		}
+
+		System.out.println();
+		for (int i = u; i >= p; i--) {
+			System.out.printf("%d ", array[i]);
+		}
+		System.out.println();
+	}
+
 	/*
 	 * FUNÇÃO PESQUISAR
 	 */
@@ -104,10 +116,11 @@ public class FilaCircular {
 			System.out.println("1 - Enfileirar");
 			System.out.println("2 - Desenfileirar");
 			System.out.println("3 - Mostrar");
-			System.out.println("4 - Pesquisar Elemento");
+			System.out.println("4 - Mostrar invertido");
+			System.out.println("5 - Pesquisar Elemento");
 			System.out.println("0 - Sair");
 			
-			System.out.printf("Sua escolha [0 a 4]: ");
+			System.out.printf("Sua escolha [0 a 5]: ");
 			do {
 				opcao = sc.nextInt();
 				if (opcao < 0 || opcao > 4) 
@@ -144,7 +157,15 @@ public class FilaCircular {
 						System.out.printf("%nErro! %s%n", e.getMessage());
 					}
 					break;
-				case 4: // Pesquisar Elemento
+				case 4: // Mostrar invertido
+					try {
+						fila.mostrarInvertido();
+					}
+					catch (Exception e) {
+						System.out.printf("%nErro! %s%n", e.getMessage());
+					}
+					break;
+				case 5: // Pesquisar Elemento
 					try {
 						System.out.printf("%nDigite um número: ");
 						elem = sc.nextInt();
