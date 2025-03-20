@@ -2,6 +2,7 @@ import java.util.Scanner;
 
 public class Aquecimento {
 
+	/*
 	public static boolean verificaFim(String str, String chave) {
 		boolean fim = false;
 
@@ -21,6 +22,7 @@ public class Aquecimento {
 	public static boolean verificaFim(String str) {
 		return verificaFim(str, "FIM");
 	}
+	*/
 
 	public static int qtMaiusculo(String str) {
 		int qt = 0;
@@ -35,11 +37,12 @@ public class Aquecimento {
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-		String str = sc.nextLine();
+		String str;
 
-		while (!verificaFim(str)) {
-			System.out.println(qtMaiusculo(str));
+		//while (!verificaFim(str)) {
+		while (sc.hasNext()) {
 			str = sc.nextLine();
+			System.out.println(qtMaiusculo(str));
 		}
 
 		sc.close();
