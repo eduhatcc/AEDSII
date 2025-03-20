@@ -2,54 +2,31 @@ import java.util.Scanner;
 
 public class SequenciaEspelho {
 
-	public static void espelho(int n1, int n2) {
-		int k = 0,
-		    n = 0,
-		    cont = 0,
-		    maior = 0,
-		    menor = 0;
-		int seq[] = new int[1000];
-		int temp[] = new int[1000];
+	public static void espelho(int inicio, int fim) {
+		String seq = "";
 
-		if (n1 > n2) {
-			maior = n1;
-			menor = n2;	
-		}
-		else {
-			maior = n2;
-			menor = n1;
+		for (int i = inicio; i <= fim; i++) {
+			seq += i;		
 		}
 
-		// ARMAZENA A SEQUÊNCIA E A STRING TEMPORÁRIA CRESCENTEMENTE
-		for (int i = menor; i <= maior; i++) {
-			seq[k] = i;
-			temp[k] = i;
-			k++; cont++;
+		System.out.print(seq);
+
+		for (int i = seq.length()-1; i >= 0; i--) {
+			System.out.print(seq.charAt(i));
 		}
 
-		// REPETIÇÃO PARA CONCATENAR A STRING TEMPORÁRIA DE FORMA INVERSA
-		for (int j = cont-1; j >= 0; j--) {
-			seq[k] = temp[j];
-			k++;
-		}
-
-		System.out.printf("%n");
-		// REPETIÇÃO PARA ESCREVER A SEQUÊNCIA ESPELHADA
-		for (int i = 0; i < k; i++) {
-			System.out.printf("%d", seq[i]);
-		}
-		System.out.printf("%n");
+		System.out.println();
 	}
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-		int n1, n2;
+		int inicio, fim;
 		//int seq[] = new int[1000];
 		
 		while (sc.hasNext()) {
-			n1 = sc.nextInt();
-			n2 = sc.nextInt();
-			espelho(n1, n2);
+			inicio = sc.nextInt();
+			fim = sc.nextInt();
+			espelho(inicio, fim);
 		}
 
 		sc.close();
