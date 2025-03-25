@@ -14,24 +14,27 @@ public class Experiencias {
 		int sapos = 0;
 
 		for (int i=0; i < N; i++) {
-			numCobaia[i] = sc.nextInt();
-			nomeCobaia += sc.next();
-			total += numCobaia[i];
+			numCobaia[i] = sc.nextInt(); 
+			nomeCobaia += sc.next(); // concatenar os chars
+			total += numCobaia[i]; // armazenar o total de cobaias
 
+			// verificação e soma de coelhos
 			if (nomeCobaia.charAt(i) == 'C') {
 				coelhos += numCobaia[i];
 			}
+			// verificação e soma de ratos
 			else if (nomeCobaia.charAt(i) == 'R') {
 				ratos += numCobaia[i];
 			}
+			// verificação e soma de sapos
 			else if (nomeCobaia.charAt(i)  == 'S') {
 				sapos += numCobaia[i];
 			}
 		}
 
-		double percCoelho =((double) coelhos / total) * 100;
-		double percRatos = ((double) ratos / total) * 100;
-		double percSapos = ((double) sapos / total) * 100;
+		double percCoelho =((double) coelhos / total) * 100; // percentual de coelhos
+		double percRatos = ((double) ratos / total) * 100; // percentual de ratos
+		double percSapos = ((double) sapos / total) * 100; // percentual de sapoos
 
 		System.out.printf("Total: %d cobaias%n", total);
 		System.out.printf("Total de coelhos: %d%n", coelhos);
