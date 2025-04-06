@@ -142,7 +142,7 @@ public class ListaLinearCara {
 			}
 		} while (TAM <= 0);
 
-		ListaLinear lista = new ListaLinearCara(TAM);
+		ListaLinearCara lista = new ListaLinearCara(TAM);
 
 		int elem = 0,
 		    pos = 0,
