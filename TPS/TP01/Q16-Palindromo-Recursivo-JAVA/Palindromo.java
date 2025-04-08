@@ -40,7 +40,7 @@ public class Palindromo {
 	 * FUNÇÃO VERIFICA FIM BASE QUE CHAMA A FUNÇÃO RECURSIVA
 	 */
 	public static boolean verificaFim(String str) {
-		return verificaFim(str, "FIM", chave, 2);
+		return verificaFim(str, "FIM", 2);
 	}
 
 	/* 
@@ -91,5 +91,6 @@ public class Palindromo {
 			}
 			str = sc.nextLine().trim();
 		}
+		sc.close();
 	}
 }
