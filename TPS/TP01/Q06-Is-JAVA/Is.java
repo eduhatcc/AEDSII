@@ -64,7 +64,6 @@ public class Is {
 
 	public static boolean isReal(String str) {
 		boolean ehReal = true;
-		boolean soInt = false;
 		int cont = 0;
 
 		for (int i=0; i < str.length(); i++) {
