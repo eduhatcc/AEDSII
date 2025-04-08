@@ -1,4 +1,7 @@
 import java.util.*;
+import java.io.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 class Show {
 	private String show_id;
@@ -16,19 +19,10 @@ class Show {
 	public Show() {
 		setId("NaN");
 		setType("NaN");
-		setTitle("NaN");
-		setDirector("NaN");
-		setCast("NaN";
-		setCountry("NaN");
-		setDate("NaN");
-		setReleaseYear("NaN");
-		setRating("NaN");
-		setDuration("NaN");
-		setListedIn("NaN");
 	}
 
-	public Show(String id, String type, String title, String director, String cast[], String country,
-				Date date, int release_year, String rating, String duration, String listed_in[]) {
+	public Show(String id, String type, String title, String director, ArrayList<String> cast, String country,
+				Date date, int release_year, String rating, String duration, ArrayList<String> listed_in) {
 		setId(id);
 		setType(type);
 		setTitle(title);
@@ -40,11 +34,14 @@ class Show {
 		setRating(rating);
 		setDuration(duration);
 		setListedIn(listed_in);
-		int n = 0;
 	}
 	
-	public void setListedIn(String listed_in[]) {
+	public void imprimir() {
+		
+	}
 
+	public void setListedIn(ArrayList<String> listed_in) {
+		this.listed_in = listed_in;
 	}
 
 	public void setDuration(String duration) {
@@ -59,16 +56,16 @@ class Show {
 		this.release_year = release_year;
 	}
 
-	public void setDate(Date date) {
-
+	public void setDate(Date date_added) {
+		this.date_added = date_added;
 	}
 
 	public void setCountry(String country) {
 		this.country = country;
 	}
 	
-	public void setCast(String cast) {
-	
+	public void setCast(ArrayList<String> cast) {
+		this.cast = cast;
 	}
 
 	private void setDirector(String director) {
@@ -129,5 +126,28 @@ class Show {
 
 	public String[] getListedIn() {
 		return this.listed_in;
+	}
+}
+
+public class Main {
+	public static void main(String[] args) {
+		
+
+		try (BufferedReader bw = new BufferedWriter(new FileWriter(path))){
+			bw.write
+			
+		} catch (Exception e) {
+			System.out.println("Error:");
+		}
+
+		Scanner sc = new Scanner(System.in);
+		String input = sc.nextLine();
+
+		while (!sc.equals("FIM")) {
+			int n = Integer.parseInt(input);
+			shows.get(n - 1).imprimir();
+            input = sc.nextLine();
+		}
+		sc.close();
 	}
 }
