@@ -52,5 +52,6 @@ public class Palindromo {
 			}
 			str = sc.nextLine().trim();
 		}
+		sc.close();
 	}
 }
