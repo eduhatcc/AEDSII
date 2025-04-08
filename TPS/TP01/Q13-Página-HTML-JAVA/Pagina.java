@@ -59,8 +59,7 @@ public class Pagina {
 		    u3 = 0,
 		    consoante = 0,
 		    br = 0,
-		    table = 0,
-		    nomePagina = 0;
+		    table = 0;
 
 		for (int j=0; j < html.length(); j++) {
 			if (html.charAt(j) == 'a') {
@@ -74,10 +73,10 @@ public class Pagina {
 			}
 			else if (html.charAt(j) == 'o') {
 				o++;
-                        }
-                        else if (html.charAt(j) == 'u') {
-                                u++;
-                        }
+            }
+            else if (html.charAt(j) == 'u') {
+                    u++;
+            }
 			else if (html.charAt(j) == '\u00e1') {
 				a0++;
 			} 
