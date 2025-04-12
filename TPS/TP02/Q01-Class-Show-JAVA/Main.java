@@ -15,10 +15,7 @@ class Show {
     private String duration;
     private ArrayList<String> listed_in;
 
-    public Show() {
-        setId("NaN");
-        setType("NaN");
-    }
+    public Show() {}
 
     public Show(String id, String type, String title, String director, ArrayList<String> cast, String country,
                 Date date, int release_year, String rating, String duration, ArrayList<String> listed_in) {
@@ -36,7 +33,19 @@ class Show {
     }
     
     public void imprimir() {
-        // Pode ser implementado se necessário
+        System.out.println("=> " +
+            this.show_id + " ## " +
+            this.title + " ## " +
+            this.type + " ## " +
+            (this.director.isEmpty() ? "NaN" : this.director) + " ## " +
+            (this.cast.length == 0 ? "[NaN]" : Arrays.toString(this.cast)) + " ## " +
+            (this.country.isEmpty() ? "NaN" : this.country) + " ## " +
+            (this.date_added != null ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(this.date_added) : "NaN") + " ## " +
+            this.release_year + " ## " +
+            this.rating + " ## " +
+            this.duration + " ## " +
+            (this.listed_in.length == 0 ? "[NaN]" : Arrays.toString(this.listed_in)) + " ##"
+        );
     }
 
     public void setListedIn(ArrayList<String> listed_in) {
@@ -129,7 +138,8 @@ class Show {
 }
 
 public class Main {
-
+    private static final String arq = "/tmp/disneyplus.csv";
+	private static final List<String> CsvLines = new ArrayList<>();
     static List<Show> shows = new ArrayList<>();
 
     // Método para buscar um Show pelo ID na lista
@@ -166,65 +176,84 @@ public class Main {
         return sb.toString();
     }
     
+    public static List<String> parseCSVLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder str = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+
+            if (c == '\"') {
+                inQuotes = !inQuotes; // alterna estado
+            } 
+            else if (c == ',' && !inQuotes) {
+                fields.add(str.toString().trim());
+                fields.setLength(0); 
+            } 
+            else {
+                str.append(c);
+            }
+        }
+        fields.add(str.toString().trim()); // último campo
+        return fields;
+    }
+
+    public static List<String> getCsvLines() {
+        return CsvLines;
+    }
+
+    public static int converteStr(String input) {
+        int valor = 0;
+        int multiplicador = 1;
+        for (int i = input.length() - 1; i > 0; i--) {
+            int numero = input.charAt(i) - '0';
+            valor += numero * multiplicador;
+            multiplicador *= 10;
+        }
+        return valor;
+    }
+
+    public static void preencher() {
+        try {
+            
+            BufferedReader br = new BufferedReader(new FileReader(arq));
+            String line;
+    
+            while((line = br.readLine()) != null) {
+                CsvLines.add(line);
+            } 
+            br.close();
+        } catch(IOException e) {
+            System.err.println("Erro ao carregar o arquivo: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
 
-        List<Show> shows = new ArrayList<>();
-		String arq = "/tmp/disneyplus.csv";
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(arq));
-         
-            String line = br.readLine(); // Lê o cabeçalho
-
-            while ((line = br.readLine()) != null) {
-                String[] fields = line.split(",");
-                
-                String id = fields[0];
-                String type = fields[1];
-                String title = fields[2];
-                String director = fields[3].isEmpty() ? "NaN" : fields[3];
-                
-                ArrayList<String> cast = new ArrayList<>();
-                if (fields[4].isEmpty()) {
-                    cast.add("NaN");
-                } else {
-                    cast.addAll(Arrays.asList(fields[4].split(", ")));
-                }
-                
-                String country = fields[5].isEmpty() ? "NaN" : fields[5];
-                
-                Date date_added = null;
-                try {
-                    String dataLimpa = fields[6].replace("\"", "").trim();
-                    date_added = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).parse(dataLimpa);
-                } catch (ParseException e) {}
-                
-                int release_year = Integer.parseInt(fields[7]);
-                
-                String rating = fields[8].isEmpty() ? "NaN" : fields[8];
-                String duration = fields[9].isEmpty() ? "NaN" : fields[9];
-                ArrayList<String> listed_in = new ArrayList<>();
-                if (fields[10].isEmpty()) {
-                    listed_in.add("NaN");
-                } else {
-                    listed_in.addAll(Arrays.asList(fields[10].split(", ")));
-                }
-                
-                Show show = new Show(id, type, title, director, cast, country, date_added, release_year, rating, duration, listed_in);
-                shows.add(show);
-            }
-            br.close();
-        } catch (IOException e) {
-			System.out.println("Erro ao ler o arquivo: " + e.getMessage());
-		}
-        
         Scanner sc = new Scanner(System.in);
-        String entrada;
-        while (!(entrada = sc.nextLine()).equals("FIM")) {
-            Show showEncontrado = buscarShowId(shows, entrada);
-            if (showEncontrado != null)
-                System.out.println("=> " + formatShow(showEncontrado));
+	    String input = sc.nextLine();
+	    Show[] shows = new Show[1500];
+	    int cont = 0;
+
+	    Show.preencher();
+	    List<String> line = Show.getCsvLines();
+
+        while(input.equals("FIM")) {
+            int index = converteStr(input);
+            if(index >=0 && index <lines.size()) {
+                Show show = new Show();
+                show.preencher(line.get(index));
+                shows[cont++] = show;
+            }
+
+            input = sc.nextLine();
         }
+
+        for(int i=0; i < cont; i++) {
+            shows[i].imprimir();	
+        }
+
         sc.close();
     }
 }
