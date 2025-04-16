@@ -142,16 +142,16 @@ public class Show {
 
     // Método imprimir utilizando os getters e tratando valores nulos ou vazios
     public void imprimir() {
-        String id = (getShowId() != null && !getShowId().isEmpty()) ? getShowId() : "NaN";
-        String titulo = (getTitle() != null && !getTitle().isEmpty()) ? getTitle() : "NaN";
-        String tipo = (getType() != null && !getType().isEmpty()) ? getType() : "NaN";
-        String diretor = (getDirector() != null && !getDirector().isEmpty()) ? getDirector() : "NaN";
-        String pais = (getCountry() != null && !getCountry().isEmpty()) ? getCountry() : "NaN";
+        String id = getShowId();
+        String titulo = getTitle();
+        String tipo = getType();
+        String diretor = getDirector();
+        String pais = getCountry();
         String data = (getDateAdded() != null)
             ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
-            : "NaN";
-        String classificacao = (getRating() != null && !getRating().isEmpty()) ? getRating() : "NaN";
-        String duracao = (getDuration() != null && !getDuration().isEmpty()) ? getDuration() : "NaN";
+            : "March 1, 1900";
+        String classificacao = getRating();
+        String duracao = getDuration();
 
         String[] elenco = getCast() != null ? getCast() : new String[0];
         String elencoStr = (elenco.length == 0) ? "[NaN]" : Arrays.toString(elenco);
@@ -215,21 +215,21 @@ public class Show {
 
         String[] coluns = array.toArray(new String[0]);
 
-        setShowId(coluns.length > 0 ? coluns[0] : "");
+        setShowId(coluns.length > 0 ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
-        setTitle(coluns.length > 2 ? coluns[2] : "");
-        setDirector(coluns.length > 3 ? coluns[3] : "");
+        setTitle(coluns.length > 2 ? coluns[2] : "NaN");
+        setDirector(coluns.length > 3 ? coluns[3] : "NaN");
         setCast(coluns.length > 4 && !coluns[4].equals("") ? coluns[4].split(", ") : new String[0]);
         if (getCast() != null && getCast().length > 1) ordenar(getCast());
-        setCountry(coluns.length > 5 ? coluns[5] : "");
+        setCountry(coluns.length > 5 ? coluns[5] : "NaN");
         try {
             setDateAdded(coluns.length > 6 && !coluns[6].equals("") ? dateFormat.parse(coluns[6]) : null);
         } catch (Exception e) {
             setDateAdded(null);
         }
         setReleaseYear(coluns.length > 7 && !coluns[7].equals("") ? Integer.parseInt(coluns[7]) : 0);
-        setRating(coluns.length > 8 ? coluns[8] : "");
-        setDuration(coluns.length > 9 ? coluns[9] : "");
+        setRating(coluns.length > 8 ? coluns[8] : "NaN");
+        setDuration(coluns.length > 9 ? coluns[9] : "NaN");
         setListedIn(coluns.length > 10 && !coluns[10].equals("") ? coluns[10].split(", ") : new String[0]);
         if (getListedIn() != null && getListedIn().length > 1) ordenar(getListedIn());
     }
@@ -247,70 +247,95 @@ public class Show {
         return valor;
     }
 
-    public static void swap(Show[] shows, int i, int j) {
-        Show temp = shows[i];
-        shows[i] = shows[j];
-        shows[j] = temp;
+    public static void swap(Show[] heap, int i, int j) {
+        Show temp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = temp;
         movimentacoes += 3;
     }
 
-    public static int getMaiorFilho(Show[] shows, int i, int tamHeap) {
-        int filho = 0;
+    public static boolean diretorMenor(Show a, Show b) {
+        String dirA = a.getDirector();
+        String dirB = b.getDirector();
+    
+        int comp = dirA.compareToIgnoreCase(dirB);
+        comparacoes++;
+        if (comp != 0) return comp < 0;
 
-        if (2*i == tamHeap || shows[2*i].getDirector().compareToIgnoreCase(shows[2*i+1].getDirector()) < 0) {
-            filho = 2*i;
+    // Desempate por título
+        String titleA = a.getTitle();
+        String titleB = b.getTitle();
+        
+        comparacoes++;
+        return titleA.compareToIgnoreCase(titleB) < 0;
+    }
+
+    public static int getMaiorFilho(Show[] heap, int i, int tamHeap) {
+        int filhoEsq = 2 * i;
+        int filhoDir = 2 * i + 1;
+        int maiorFilho = 0;
+    
+        comparacoes++;
+        if (filhoDir > tamHeap) {
+            maiorFilho = filhoEsq;
         }
         else {
-            filho = 2*i+1;
-        }
-
-        return filho;
-    }
-
-    public static void reconstruir(Show[] shows, int tamHeap) {
-        int i = 1;
-        while (i <= tamHeap/2) {
-            int filho = getMaiorFilho(shows, i, tamHeap);
-            if (shows[i].getDirector() != null && shows[filho].getDirector() != null) {
-                if (shows[i].getDirector().compareToIgnoreCase(shows[filho].getDirector()) < 0) {
-                    swap(shows, i, filho);
-                    i = filho;
-                } 
-                else {
-                    i = tamHeap;
-                }
+            if (diretorMenor(heap[filhoEsq], heap[filhoDir])) {
+                maiorFilho = filhoDir;
+            }
+            else {
+                maiorFilho = filhoEsq;
             }
         }
+    
+        return maiorFilho;
     }
 
-    public static void construir (Show[] shows, int tamHeap) {
-        int i = tamHeap;
+    public static void reconstruir(Show[] heap, int tamHeap) {
+        int i = 1;
+        while (i <= tamHeap/2) {
+            int filho = getMaiorFilho(heap, i, tamHeap);
 
-        while (i > 1 && shows[i].getDirector().compareToIgnoreCase(shows[i/2].getDirector()) < 0) {
-            swap(shows, i, i/2);
-            i/=2;
+            if (!diretorMenor(heap[filho], heap[i])) {
+                    swap(heap, i, filho);
+                    i = filho;
+            } 
+            else {
+                i = tamHeap;
+            }
+            
+        }
+    }
+
+    public static void construir (Show[] heap, int tamHeap) {
+        int i = tamHeap;
+        while (i > 1 && diretorMenor(heap[i / 2], heap[i])) {
+            swap(heap, i, i / 2);
+            i /= 2;
         }
     }
 
     public static void heapsort(Show[] shows, int n) {  
-        Show[] tmp = new Show[n+1];
+        Show[] heap = new Show[n+1];
         for (int i=0; i < n; i++) {
-            tmp[i+1] = shows[i];
+            heap[i+1] = shows[i];
+            movimentacoes++;
         }
 
         int tamHeap = 2;
         while (tamHeap <= n) {
-            construir(tmp, tamHeap++);
+            construir(heap, tamHeap++);
         }
 
         tamHeap = n;
         while (tamHeap > 1) {
-            swap(tmp, 1, tamHeap--);
-            reconstruir(shows, tamHeap);
+            swap(heap, 1, tamHeap--);
+            reconstruir(heap, tamHeap);
         }
         
         for (int i=0; i < n; i++) {
-            shows[i] = tmp[i+1];
+            shows[i] = heap[i+1];
+            movimentacoes++;
         }
     }
 
@@ -335,7 +360,7 @@ public class Show {
         }
 
         long start = System.nanoTime();
-        Show.heapsort(shows, 300);
+        Show.heapsort(shows, cont);
         long end = System.nanoTime();
         double tempo = (end - start) / 1e6; // em milissegundos
 
