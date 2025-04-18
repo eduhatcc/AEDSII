@@ -16,10 +16,10 @@ public class Show {
     private String listed_in[];
     
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "/tmp/disneyplus.csv";
+    private static String arq = "../tmp/disneyplus.csv";
     private static List<String> csv = new ArrayList<>();
     
-    public static String log = "matricula_selecao.txt";
+    public static String log = "874201_selecao.txt";
     public static int matricula = 874201;
     public static int comparacoes = 0;
     public static int movimentacoes = 0;
