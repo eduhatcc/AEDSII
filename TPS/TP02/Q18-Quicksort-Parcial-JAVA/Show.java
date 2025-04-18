@@ -20,7 +20,7 @@ public class Show {
     private static String arq = "/tmp/disneyplus.csv";
     private static List<String> csv = new ArrayList<>();
     
-    public static String log = "matricula_quicksort.txt";
+    public static String log = "874201_quicksort.txt";
     public static int matricula = 874201;
     public static int comparacoes = 0;
     public static int movimentacoes = 0;
@@ -127,27 +127,20 @@ public class Show {
 
     // Método imprimir utilizando os getters e tratando valores nulos ou vazios
     public void imprimir() {
-        String id = (getShowId() != null && !getShowId().isEmpty()) ? getShowId() : "NaN";
-        String titulo = (getTitle() != null && !getTitle().isEmpty()) ? getTitle() : "NaN";
-        String tipo = (getType() != null && !getType().isEmpty()) ? getType() : "NaN";
-        String diretor = (getDirector() != null && !getDirector().isEmpty()) ? getDirector() : "NaN";
-        String pais = (getCountry() != null && !getCountry().isEmpty()) ? getCountry() : "NaN";
-        String data = (getDateAdded() != null)
-            ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
-            : "NaN";
-        String classificacao = (getRating() != null && !getRating().isEmpty()) ? getRating() : "NaN";
-        String duracao = (getDuration() != null && !getDuration().isEmpty()) ? getDuration() : "NaN";
+        String dateAdded = (getDateAdded() != null)
+        ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
+        : "March 1, 1900";
+        
+        String[] casts = getCast();
+        String castStr = Arrays.toString(casts);
 
-        String[] elenco = getCast() != null ? getCast() : new String[0];
-        String elencoStr = (elenco.length == 0) ? "[NaN]" : Arrays.toString(elenco);
+        String[] listedIn = getListedIn();
+        String listedInStr = Arrays.toString(listedIn);
 
-        String[] categorias = getListedIn() != null ? getListedIn() : new String[0];
-        String categoriasStr = (categorias.length == 0) ? "[NaN]" : Arrays.toString(categorias);
-
-        System.out.println("=> " + id + " ## " + titulo + " ## " + tipo + " ## " +
-            diretor + " ## " + elencoStr + " ## " + pais + " ## " +
-            data + " ## " + getReleaseYear() + " ## " + classificacao + " ## " +
-            duracao + " ## " + categoriasStr + " ##");
+        System.out.println("=> " + getShowId() + " ## " + getTitle() + " ## " + getType() + " ## " +
+            getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
+            dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
+            getDuration() + " ## " + listedInStr + " ##");
     }
     
     public static void preencher() {
@@ -200,23 +193,23 @@ public class Show {
 
         String[] coluns = array.toArray(new String[0]);
 
-        setShowId(coluns.length > 0 ? coluns[0] : "");
+        setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
-        setTitle(coluns.length > 2 ? coluns[2] : "");
-        setDirector(coluns.length > 3 ? coluns[3] : "");
-        setCast(coluns.length > 4 && !coluns[4].equals("") ? coluns[4].split(", ") : new String[0]);
-        if (getCast() != null && getCast().length > 1) ordenar(getCast());
-        setCountry(coluns.length > 5 ? coluns[5] : "");
+        setTitle(coluns.length > 2 && !coluns[2].isEmpty() ? coluns[2] : "NaN");
+        setDirector(coluns.length > 3 && !coluns[3].isEmpty() ? coluns[3] : "NaN");
+        setCast(coluns.length > 4 && !coluns[4].isEmpty() ? coluns[4].split(", ") : new String[]{"NaN"});
+        if (getCast().length > 1) ordenar(getCast());
+        setCountry(coluns.length > 5 && !coluns[5].isEmpty() ? coluns[5] : "NaN");
         try {
-            setDateAdded(coluns.length > 6 && !coluns[6].equals("") ? dateFormat.parse(coluns[6]) : null);
+            setDateAdded(coluns.length > 6 && !coluns[6].isEmpty() ? dateFormat.parse(coluns[6]) : null);
         } catch (Exception e) {
             setDateAdded(null);
         }
-        setReleaseYear(coluns.length > 7 && !coluns[7].equals("") ? Integer.parseInt(coluns[7]) : 0);
-        setRating(coluns.length > 8 ? coluns[8] : "");
-        setDuration(coluns.length > 9 ? coluns[9] : "");
-        setListedIn(coluns.length > 10 && !coluns[10].equals("") ? coluns[10].split(", ") : new String[0]);
-        if (getListedIn() != null && getListedIn().length > 1) ordenar(getListedIn());
+        setReleaseYear(coluns.length > 7 && !coluns[7].isEmpty() ? Integer.parseInt(coluns[7]) : 0);
+        setRating(coluns.length > 8 && !coluns[8].isEmpty() ? coluns[8] : "NaN");
+        setDuration(coluns.length > 9 && !coluns[9].isEmpty() ? coluns[9] : "NaN");
+        setListedIn(coluns.length > 10 && !coluns[10].isEmpty() ? coluns[10].split(", ") : new String[]{"NaN"});
+        if (getListedIn().length > 1) ordenar(getListedIn());
     }
     
     // Converte a string de entrada no índice do CSV
@@ -239,27 +232,17 @@ public class Show {
         movimentacoes += 3;
     }
 
-    public static int datacmp(LocalDate dateA, LocalDate dateB) {
-        int resp = 0;
-
-        if (resp == 0 && dateA.getYear() != dateB.getYear()) {
-            resp = (dateA.getYear() < dateB.getYear()) ? -1 : 1;
-        }
-
-        if (resp == 0 && dateA.getMonthValue() != dateB.getMonthValue()) {
-            resp = (dateA.getMonthValue() < dateB.getMonthValue()) ? -1 : 1;
-        }
-
-        if (resp == 0 && dateA.getDayOfMonth() != dateB.getDayOfMonth()) {
-            resp = (dateA.getDayOfMonth() < dateB.getDayOfMonth()) ? -1 : 1;
-        }
-
-        return resp;
+    public static int datecmp(LocalDate dateA, LocalDate dateB) {
+        return dateA.compareTo(dateB);
     }
 
     public static int validacao(Show dateA, Show dateB) {
         int resp = 0;
-        int date = datecmp(dateA.getDateAdded(), dateB.getDateAdded());
+
+        LocalDate localDateA = dateA.getDateAdded() != null ? dateA.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
+        LocalDate localDateB = dateB.getDateAdded() != null ? dateB.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
+                                                                                                                    
+        int date = datecmp(localDateA, localDateB);
 
         if (date != 0) {
             resp = date;
@@ -281,23 +264,23 @@ public class Show {
 
         while (i <= j) {
             while (validacao(shows[i], meio) < 0) i++;
-            while (validacao(shows[j], meio) < 0) j--;
+            while (validacao(shows[j], meio) > 0) j--;
 
             if (i <= j) {
                 swap(shows, i, j);
                 i++;
                 j--;
             }
-
-            if (esq < j) quicksort(shows, esq, dir);
-            
-            if (i < dir) quicksort(shows, esq, dir);
         }
+        
+        if (esq < j) quicksort(shows, esq, j);
+            
+        if (i < dir) quicksort(shows, i, dir);
     }
 
     // Função quicksort base
-    public static void quicksort(Show[] shows) {
-        quicksort(shows, 0, 10);
+    public static void quicksort(Show[] shows, int cont) {
+        quicksort(shows, 0, cont);
     }
 
     public static void main(String[] args) {
@@ -321,7 +304,7 @@ public class Show {
         }
 
         long start = System.nanoTime();
-        Show.quicksort(shows);
+        Show.quicksort(shows, cont-1);
         long end = System.nanoTime();
         double tempo = (end - start) / 1e6; // em milissegundos
 
