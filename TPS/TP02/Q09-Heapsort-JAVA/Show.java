@@ -1,7 +1,6 @@
 import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 
 public class Show {
     private String show_id;
@@ -17,10 +16,10 @@ public class Show {
     private String listed_in[];
     
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "/tmp/disneyplus.csv";
+    private static String arq = "../tmp/disneyplus.csv";
     private static List<String> csv = new ArrayList<>();
     
-    public static String log = "matricula_heapsort.txt";
+    public static String log = "874201_heapsort.txt";
     public static int matricula = 874201;
     public static int comparacoes = 0;
     public static int movimentacoes = 0;
@@ -30,21 +29,6 @@ public class Show {
     }
 
     public Show() {}
-
-    public Show(String show_id, String type, String title, String director, String[] cast, String country,
-			LocalDate date_added, Integer release_year, String rating, String duration, String[] listed_in) {
-        setShowId(show_id);
-        setType(type);
-        setTitle(title);
-        setDirector(director);
-        setCast(cast);
-        setCountry(country);
-        setDateAdded(getDateAdded());
-        setReleaseYear(release_year);
-        setRating(rating);
-        setDuration(duration);
-        setListedIn(listed_in);
-	}
 
     public void setShowId(String show_id) {
         this.show_id = show_id;
@@ -142,27 +126,20 @@ public class Show {
 
     // Método imprimir utilizando os getters e tratando valores nulos ou vazios
     public void imprimir() {
-        String id = getShowId();
-        String titulo = getTitle();
-        String tipo = getType();
-        String diretor = getDirector();
-        String pais = getCountry();
-        String data = (getDateAdded() != null)
-            ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
-            : "March 1, 1900";
-        String classificacao = getRating();
-        String duracao = getDuration();
+        String dateAdded = (getDateAdded() != null)
+        ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
+        : "March 1, 1900";
+        
+        String[] casts = getCast();
+        String castStr = Arrays.toString(casts);
 
-        String[] elenco = getCast() != null ? getCast() : new String[0];
-        String elencoStr = (elenco.length == 0) ? "[NaN]" : Arrays.toString(elenco);
+        String[] listedIn = getListedIn();
+        String listedInStr = Arrays.toString(listedIn);
 
-        String[] categorias = getListedIn() != null ? getListedIn() : new String[0];
-        String categoriasStr = (categorias.length == 0) ? "[NaN]" : Arrays.toString(categorias);
-
-        System.out.println("=> " + id + " ## " + titulo + " ## " + tipo + " ## " +
-            diretor + " ## " + elencoStr + " ## " + pais + " ## " +
-            data + " ## " + getReleaseYear() + " ## " + classificacao + " ## " +
-            duracao + " ## " + categoriasStr + " ##");
+        System.out.println("=> " + getShowId() + " ## " + getTitle() + " ## " + getType() + " ## " +
+            getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
+            dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
+            getDuration() + " ## " + listedInStr + " ##");
     }
     
     public static void preencher() {
@@ -215,23 +192,23 @@ public class Show {
 
         String[] coluns = array.toArray(new String[0]);
 
-        setShowId(coluns.length > 0 ? coluns[0] : "NaN");
+        setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
-        setTitle(coluns.length > 2 ? coluns[2] : "NaN");
-        setDirector(coluns.length > 3 ? coluns[3] : "NaN");
-        setCast(coluns.length > 4 && !coluns[4].equals("") ? coluns[4].split(", ") : new String[0]);
-        if (getCast() != null && getCast().length > 1) ordenar(getCast());
-        setCountry(coluns.length > 5 ? coluns[5] : "NaN");
+        setTitle(coluns.length > 2 && !coluns[2].isEmpty() ? coluns[2] : "NaN");
+        setDirector(coluns.length > 3 && !coluns[3].isEmpty() ? coluns[3] : "NaN");
+        setCast(coluns.length > 4 && !coluns[4].isEmpty() ? coluns[4].split(", ") : new String[]{"NaN"});
+        if (getCast().length > 1) ordenar(getCast());
+        setCountry(coluns.length > 5 && !coluns[5].isEmpty() ? coluns[5] : "NaN");
         try {
-            setDateAdded(coluns.length > 6 && !coluns[6].equals("") ? dateFormat.parse(coluns[6]) : null);
+            setDateAdded(coluns.length > 6 && !coluns[6].isEmpty() ? dateFormat.parse(coluns[6]) : null);
         } catch (Exception e) {
             setDateAdded(null);
         }
-        setReleaseYear(coluns.length > 7 && !coluns[7].equals("") ? Integer.parseInt(coluns[7]) : 0);
-        setRating(coluns.length > 8 ? coluns[8] : "NaN");
-        setDuration(coluns.length > 9 ? coluns[9] : "NaN");
-        setListedIn(coluns.length > 10 && !coluns[10].equals("") ? coluns[10].split(", ") : new String[0]);
-        if (getListedIn() != null && getListedIn().length > 1) ordenar(getListedIn());
+        setReleaseYear(coluns.length > 7 && !coluns[7].isEmpty() ? Integer.parseInt(coluns[7]) : 0);
+        setRating(coluns.length > 8 && !coluns[8].isEmpty() ? coluns[8] : "NaN");
+        setDuration(coluns.length > 9 && !coluns[9].isEmpty() ? coluns[9] : "NaN");
+        setListedIn(coluns.length > 10 && !coluns[10].isEmpty() ? coluns[10].split(", ") : new String[]{"NaN"});
+        if (getListedIn().length > 1) ordenar(getListedIn());
     }
     
     // Converte a string de entrada no índice do CSV
@@ -253,23 +230,38 @@ public class Show {
         heap[j] = temp;
         movimentacoes += 3;
     }
-
+    
     public static boolean diretorMenor(Show a, Show b) {
+        boolean vazioA = (a.getDirector() == null || a.getDirector().isEmpty());
+        boolean vazioB = (b.getDirector() == null || b.getDirector().isEmpty());
+
+        if (vazioA && vazioB) {
+            return false;
+        }
+        if (vazioA) { 
+            comparacoes++; 
+            return false; 
+        }
+        if (vazioB) { 
+            comparacoes++; 
+            return true; 
+        }
+    
         String dirA = a.getDirector();
         String dirB = b.getDirector();
     
-        int comp = dirA.compareToIgnoreCase(dirB);
         comparacoes++;
+        int comp = dirA.compareToIgnoreCase(dirB);
         if (comp != 0) return comp < 0;
-
-    // Desempate por título
+    
+        // Desempate por título
         String titleA = a.getTitle();
         String titleB = b.getTitle();
-        
+    
         comparacoes++;
         return titleA.compareToIgnoreCase(titleB) < 0;
     }
-
+    
     public static int getMaiorFilho(Show[] heap, int i, int tamHeap) {
         int filhoEsq = 2 * i;
         int filhoDir = 2 * i + 1;
@@ -278,66 +270,63 @@ public class Show {
         comparacoes++;
         if (filhoDir > tamHeap) {
             maiorFilho = filhoEsq;
-        }
-        else {
+        } else {
             if (diretorMenor(heap[filhoEsq], heap[filhoDir])) {
                 maiorFilho = filhoDir;
-            }
-            else {
+            } else {
                 maiorFilho = filhoEsq;
             }
         }
     
         return maiorFilho;
     }
-
+    
     public static void reconstruir(Show[] heap, int tamHeap) {
         int i = 1;
-        while (i <= tamHeap/2) {
+        while (i <= tamHeap / 2) {
             int filho = getMaiorFilho(heap, i, tamHeap);
-
+    
             if (!diretorMenor(heap[filho], heap[i])) {
-                    swap(heap, i, filho);
-                    i = filho;
-            } 
-            else {
+                swap(heap, i, filho);
+                i = filho;
+            } else {
                 i = tamHeap;
             }
-            
         }
     }
-
-    public static void construir (Show[] heap, int tamHeap) {
+    
+    public static void construir(Show[] heap, int tamHeap) {
         int i = tamHeap;
         while (i > 1 && diretorMenor(heap[i / 2], heap[i])) {
             swap(heap, i, i / 2);
             i /= 2;
         }
     }
-
-    public static void heapsort(Show[] shows, int n) {  
-        Show[] heap = new Show[n+1];
-        for (int i=0; i < n; i++) {
-            heap[i+1] = shows[i];
+    
+    public static void heapsort(Show[] shows, int n) {
+        Show[] heap = new Show[n + 1];
+        for (int i = 0; i < n; i++) {
+            heap[i + 1] = shows[i];
             movimentacoes++;
         }
-
+    
         int tamHeap = 2;
         while (tamHeap <= n) {
             construir(heap, tamHeap++);
         }
-
+    
         tamHeap = n;
         while (tamHeap > 1) {
             swap(heap, 1, tamHeap--);
             reconstruir(heap, tamHeap);
         }
-        
-        for (int i=0; i < n; i++) {
-            shows[i] = heap[i+1];
+    
+        for (int i = 0; i < n; i++) {
+            shows[i] = heap[i + 1];
             movimentacoes++;
         }
     }
+    
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
