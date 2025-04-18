@@ -16,10 +16,10 @@ public class Show {
     private String listed_in[];
     
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "/tmp/disneyplus.csv";
+    private static String arq = "../tmp/disneyplus.csv";
     private static List<String> csv = new ArrayList<>();
     
-    public static String log = "matricula_insercao.txt";
+    public static String log = "874201_insercao.txt";
     public static int matricula = 874201;
     public static int comparacoes = 0;
     public static int movimentacoes = 0;
@@ -126,27 +126,20 @@ public class Show {
 
     // Método imprimir utilizando os getters e tratando valores nulos ou vazios
     public void imprimir() {
-        String id = (getShowId() != null && !getShowId().isEmpty()) ? getShowId() : "NaN";
-        String titulo = (getTitle() != null && !getTitle().isEmpty()) ? getTitle() : "NaN";
-        String tipo = (getType() != null && !getType().isEmpty()) ? getType() : "NaN";
-        String diretor = (getDirector() != null && !getDirector().isEmpty()) ? getDirector() : "NaN";
-        String pais = (getCountry() != null && !getCountry().isEmpty()) ? getCountry() : "NaN";
-        String data = (getDateAdded() != null)
-            ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
-            : "NaN";
-        String classificacao = (getRating() != null && !getRating().isEmpty()) ? getRating() : "NaN";
-        String duracao = (getDuration() != null && !getDuration().isEmpty()) ? getDuration() : "NaN";
+        String dateAdded = (getDateAdded() != null)
+        ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
+        : "March 1, 1900";
+        
+        String[] casts = getCast();
+        String castStr = Arrays.toString(casts);
 
-        String[] elenco = getCast() != null ? getCast() : new String[0];
-        String elencoStr = (elenco.length == 0) ? "[NaN]" : Arrays.toString(elenco);
+        String[] listedIn = getListedIn();
+        String listedInStr = Arrays.toString(listedIn);
 
-        String[] categorias = getListedIn() != null ? getListedIn() : new String[0];
-        String categoriasStr = (categorias.length == 0) ? "[NaN]" : Arrays.toString(categorias);
-
-        System.out.println("=> " + id + " ## " + titulo + " ## " + tipo + " ## " +
-            diretor + " ## " + elencoStr + " ## " + pais + " ## " +
-            data + " ## " + getReleaseYear() + " ## " + classificacao + " ## " +
-            duracao + " ## " + categoriasStr + " ##");
+        System.out.println("=> " + getShowId() + " ## " + getTitle() + " ## " + getType() + " ## " +
+            getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
+            dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
+            getDuration() + " ## " + listedInStr + " ##");
     }
     
     public static void preencher() {
@@ -199,23 +192,23 @@ public class Show {
 
         String[] coluns = array.toArray(new String[0]);
 
-        setShowId(coluns.length > 0 ? coluns[0] : "");
+        setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
-        setTitle(coluns.length > 2 ? coluns[2] : "");
-        setDirector(coluns.length > 3 ? coluns[3] : "");
-        setCast(coluns.length > 4 && !coluns[4].equals("") ? coluns[4].split(", ") : new String[0]);
-        if (getCast() != null && getCast().length > 1) ordenar(getCast());
-        setCountry(coluns.length > 5 ? coluns[5] : "");
+        setTitle(coluns.length > 2 && !coluns[2].isEmpty() ? coluns[2] : "NaN");
+        setDirector(coluns.length > 3 && !coluns[3].isEmpty() ? coluns[3] : "NaN");
+        setCast(coluns.length > 4 && !coluns[4].isEmpty() ? coluns[4].split(", ") : new String[]{"NaN"});
+        if (getCast().length > 1) ordenar(getCast());
+        setCountry(coluns.length > 5 && !coluns[5].isEmpty() ? coluns[5] : "NaN");
         try {
-            setDateAdded(coluns.length > 6 && !coluns[6].equals("") ? dateFormat.parse(coluns[6]) : null);
+            setDateAdded(coluns.length > 6 && !coluns[6].isEmpty() ? dateFormat.parse(coluns[6]) : null);
         } catch (Exception e) {
             setDateAdded(null);
         }
-        setReleaseYear(coluns.length > 7 && !coluns[7].equals("") ? Integer.parseInt(coluns[7]) : 0);
-        setRating(coluns.length > 8 ? coluns[8] : "");
-        setDuration(coluns.length > 9 ? coluns[9] : "");
-        setListedIn(coluns.length > 10 && !coluns[10].equals("") ? coluns[10].split(", ") : new String[0]);
-        if (getListedIn() != null && getListedIn().length > 1) ordenar(getListedIn());
+        setReleaseYear(coluns.length > 7 && !coluns[7].isEmpty() ? Integer.parseInt(coluns[7]) : 0);
+        setRating(coluns.length > 8 && !coluns[8].isEmpty() ? coluns[8] : "NaN");
+        setDuration(coluns.length > 9 && !coluns[9].isEmpty() ? coluns[9] : "NaN");
+        setListedIn(coluns.length > 10 && !coluns[10].isEmpty() ? coluns[10].split(", ") : new String[]{"NaN"});
+        if (getListedIn().length > 1) ordenar(getListedIn());
     }
     
     // Converte a string de entrada no índice do CSV
@@ -231,24 +224,29 @@ public class Show {
         return valor;
     }
 
-    public static void swap(Show[] shows, int menor, int i) {
-        Show temp = shows[i];
-        shows[i] = shows[menor];
-        shows[menor] = temp;
-        movimentacoes += 3;
-    }
-
     public static void insercao(Show[] shows, int n) {  
-        for (int i=0; i < n-1; i++) {
-            int menor = i;
+        for (int i = 1; i < n; i++) {
+            Show temp = shows[i];
 
-            for (int j=i+1; j < n; j++) {
-                comparacoes++;
-                if (shows[j].getTitle().compareToIgnoreCase(shows[menor].getTitle()) < 0) {
-                    menor = j;
+            int j = i-1;
+
+            while ((j >= 0) && (temp.getType().compareToIgnoreCase(shows[j].getType()) < 0 || 
+            (temp.getType().compareToIgnoreCase(shows[j].getType()) == 0 && 
+            temp.getTitle().compareToIgnoreCase(shows[j].getTitle()) < 0))) {
+                
+                if (temp.getType().compareToIgnoreCase(shows[j].getType()) < 0) {
+                    comparacoes++;
+                } 
+                else {
+                    comparacoes += 3;
                 }
+
+                movimentacoes++;
+                shows[j + 1] = shows[j];
+                j--;
             }
-            swap(shows, menor, i);
+            shows[j+1] = temp;
+            movimentacoes++;
         }
     }
 
@@ -273,7 +271,7 @@ public class Show {
         }
 
         long start = System.nanoTime();
-        Show.insercao(shows, 300);
+        Show.insercao(shows, cont);
         long end = System.nanoTime();
         double tempo = (end - start) / 1e6; // em milissegundos
 
