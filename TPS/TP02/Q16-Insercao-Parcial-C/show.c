@@ -537,21 +537,37 @@ int convert_str_to_int(char *str) {
     
     return value;
 }
-
-void swap(Show *s, int i, int j) {
-    Show tmp = s[i];
-    s[i] = s[j];
-    s[j] = tmp;
-    movimentacoes += 3;
-}
-
 /*
     FALTA IMPLEMENTAR O INSERÇÃO
 */
-void insercaoMain()
+void insercaoParcial(Show *s, int n, int cont) {
+    for (int i = 1; i < n; i++) {
+        Show temp = s[i];
+        int j = (i < 10) ? i - 1 : 10 - 1;
+
+        while ((j >= 0) &&
+        (strcmp(temp.type, s[j].type) < 0 || 
+        (strcmp(temp.type, s[j].type) == 0 && strcmp(temp.title, s[j].title) < 0))) {
+      
+            if (strcmp(temp.type, s[j].type) < 0) {
+                comparacoes++;
+            }
+            else {
+                comparacoes += 3;
+            }
+
+            s[j+1] = s[j];
+            movimentacoes++;
+            j--;
+        }
+        s[j+1] = temp;
+        movimentacoes++;      
+        
+    }
+}
 
 void insercao(Show *s, int n) {
-    return insercaoMain(s, )
+    insercaoParcial(s, n, 10);
 }
 
 int main() {
@@ -578,18 +594,18 @@ int main() {
         }
 
         clock_t start = clock();
-        quicksort(shows, count-1);
+        insercao(shows, count);
         clock_t end = clock();
         double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
         
-        FILE *log = fopen("874201_selecaoRecursivo.txt", "w");
+        FILE *log = fopen("874201_insercaoParcial.txt", "w");
         if (log) {
             fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, time);
             fclose(log);
         }
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < 10; i++) {
             print_show(&shows[i]);
             free_show(&shows[i]);
         }
