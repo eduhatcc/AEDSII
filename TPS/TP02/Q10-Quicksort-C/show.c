@@ -38,7 +38,11 @@ void init_show(Show *show) {
     show->cast = malloc(sizeof(char *));
     show->cast[0] = strdup("NaN");
     show->castCount = 1;
-    show->dateAdded = NULL;
+    show->dateAdded = malloc(sizeof(struct tm));
+    memset(show->dateAdded, 0, sizeof(struct tm));
+    show->dateAdded->tm_mday = 1;  // Dia 1
+    show->dateAdded->tm_mon = 2;   // Março
+    show->dateAdded->tm_year = 0;  // 1900
     show->releaseYear = 0;
     strcpy(show->rating, "NaN");
     strcpy(show->duration, "NaN");
@@ -534,14 +538,81 @@ int convert_str_to_int(char *str) {
     return value;
 }
 
-void swap(Show *s, int i, int j) {
-    Show tmp = s[i];
-    s[i] = s[j];
-    s[j] = tmp;
+char *strdup_lower(const char *src) {
+    char *dup = strdup(src);             
+    if (!dup) exit(1);
+    for (int i = 0; dup[i]; i++) {
+        dup[i] = tolower((unsigned char)dup[i]);
+    }
+    return dup;
+}
+
+void swap(Show *heap, int i, int j) {
+    Show tmp = heap[i];
+    heap[i] = heap[j];
+    heap[j] = tmp;
     movimentacoes += 3;
 }
 
+int datecmp(struct tm *dateA, struct tm *dateB) {
+    int resp = 0;
 
+    if (resp == 0 && dateA->tm_year != dateB->tm_year) {
+        resp = (dateA->tm_year < dateB->tm_year) ? -1 : 1;
+    }
+    if (resp == 0 && dateA->tm_mon != dateB->tm_mon) {
+        resp = (dateA->tm_mon < dateB->tm_mon) ? -1 : 1;
+    }
+    if (resp == 0 && dateA->tm_mday != dateB->tm_mday) {
+        resp = (dateA->tm_mday < dateB->tm_mday) ? -1 : 1;
+    }
+
+    return resp;
+}
+
+int validacao(Show dateA, Show dateB) {
+    int cmp = datecmp(dateA.dateAdded, dateB.dateAdded);
+
+    comparacoes++;
+    if (cmp != 0) return cmp;
+
+    char *lowA = strdup_lower(dateA.title);
+    char *lowB = strdup_lower(dateB.title);
+
+    comparacoes++;
+    cmp = strcmp(lowA, lowB);
+
+    free(lowA);
+    free(lowB);
+
+    return cmp;
+}
+
+
+
+void quicksort(Show *s, int esq, int dir) {
+    int i = esq,
+        j = dir;
+    Show meio = s[(esq + dir) / 2];
+
+    while (i <= j) {
+        while (validacao(s[i], meio) < 0) i++;
+        while (validacao(s[j], meio) > 0) j--;
+
+        if (i <= j) {
+            swap(s, i, j);
+            i++; j--;
+        }
+    }
+
+    if (esq < j) quicksort(s, esq, j);
+
+    if (i < dir) quicksort(s, i, dir);
+}
+
+void quicksortBase(Show *s, int n) {
+    quicksort(s, 0, n);
+}
 
 int main() {
     char input[100];
@@ -567,14 +638,14 @@ int main() {
         }
 
         clock_t start = clock();
-        quicksort(shows, count-1);
+        quicksortBase(shows, count-1);
         clock_t end = clock();
-        double tempo = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
+        double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
         
-        FILE *log = fopen("874201_selecaoRecursivo.txt", "w");
+        FILE *log = fopen("874201_quicksort.txt", "w");
         if (log) {
-            fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, tempo);
+            fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, time);
             fclose(log);
         }
 
