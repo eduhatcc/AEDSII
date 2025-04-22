@@ -547,10 +547,10 @@ char *strdup_lower(const char *src) {
     return dup;
 }
 
-void swap(Show *heap, int i, int j) {
-    Show tmp = heap[i];
-    heap[i] = heap[j];
-    heap[j] = tmp;
+void swap(Show *s, int i, int j) {
+    Show tmp = s[i];
+    s[i] = s[j];
+    s[j] = tmp;
     movimentacoes += 3;
 }
 
@@ -588,30 +588,14 @@ int validacao(Show dateA, Show dateB) {
     return cmp;
 }
 
-
-
-void quicksort(Show *s, int esq, int dir) {
-    int i = esq,
-        j = dir;
-    Show meio = s[(esq + dir) / 2];
-
-    while (i <= j) {
-        while (validacao(s[i], meio) < 0) i++;
-        while (validacao(s[j], meio) > 0) j--;
-
-        if (i <= j) {
-            swap(s, i, j);
-            i++; j--;
+void bubblesort(Show *s, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (validacao(s[j], s[j + 1]) > 0) {
+                swap(s, j, j + 1);
+            }
         }
     }
-
-    if (esq < j) quicksort(s, esq, j);
-
-    if (i < dir) quicksort(s, i, dir);
-}
-
-void quicksortBase(Show *s, int n) {
-    quicksort(s, 0, n);
 }
 
 int main() {
@@ -619,7 +603,7 @@ int main() {
     Show shows[MAX_SHOWS];
     int count = 0;
     
-    read_file("../tmp/disneyplus.csv");
+    read_file("/tmp/disneyplus.csv");
     
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 
@@ -638,12 +622,12 @@ int main() {
         }
 
         clock_t start = clock();
-        quicksortBase(shows, count-1);
+        bubblesort(shows, count);
         clock_t end = clock();
         double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
         
-        FILE *log = fopen("874201_quicksort.txt", "w");
+        FILE *log = fopen("874201_bolha.txt", "w");
         if (log) {
             fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, time);
             fclose(log);
