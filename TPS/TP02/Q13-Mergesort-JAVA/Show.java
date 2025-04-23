@@ -30,6 +30,22 @@ public class Show {
 
     public Show() {}
 
+    public Show(String show_id, String type, String title, String director, 
+           String[] cast, String country, Date date_added, int release_year, 
+           String rating, String duration, String[] listed_in) {
+        setShowId(show_id);
+        setType(type);
+        setTitle(title);
+        setDirector(director);
+        setCast(cast);
+        setCountry(country);
+        setDateAdded(date_added);
+        setReleaseYear(release_year);
+        setRating(rating);
+        setDuration(duration);
+        setListedIn(listed_in);
+    }
+
     public void setShowId(String show_id) {
         this.show_id = show_id;
     }
@@ -192,23 +208,28 @@ public class Show {
 
         String[] coluns = array.toArray(new String[0]);
 
-        setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
-        setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
-        setTitle(coluns.length > 2 && !coluns[2].isEmpty() ? coluns[2] : "NaN");
-        setDirector(coluns.length > 3 && !coluns[3].isEmpty() ? coluns[3] : "NaN");
-        setCast(coluns.length > 4 && !coluns[4].isEmpty() ? coluns[4].split(", ") : new String[]{"NaN"});
-        if (getCast().length > 1) ordenar(getCast());
-        setCountry(coluns.length > 5 && !coluns[5].isEmpty() ? coluns[5] : "NaN");
+        String show_id = (coluns.length > 0 && !coluns[0].isEmpty()) ? coluns[0] : "NaN";
+        String type = (coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie")) ? "Movie" : "TV Show";
+        String title = (coluns.length > 2 && !coluns[2].isEmpty()) ? coluns[2] : "NaN";
+        String director = (coluns.length > 3 && !coluns[3].isEmpty()) ? coluns[3] : "NaN";
+        String[] cast = (coluns.length > 4 && !coluns[4].isEmpty()) ? coluns[4].split(", ") : new String[]{"NaN"};
+        if (cast.length > 1) ordenar(cast);
+        String country = (coluns.length > 5 && !coluns[5].isEmpty()) ? coluns[5] : "NaN";
+        
+        Date date_added;
         try {
-            setDateAdded(coluns.length > 6 && !coluns[6].isEmpty() ? dateFormat.parse(coluns[6]) : null);
+            date_added = (coluns.length > 6 && !coluns[6].isEmpty()) ? dateFormat.parse(coluns[6]) : null;
         } catch (Exception e) {
-            setDateAdded(null);
+            date_added = null;
         }
-        setReleaseYear(coluns.length > 7 && !coluns[7].isEmpty() ? Integer.parseInt(coluns[7]) : 0);
-        setRating(coluns.length > 8 && !coluns[8].isEmpty() ? coluns[8] : "NaN");
-        setDuration(coluns.length > 9 && !coluns[9].isEmpty() ? coluns[9] : "NaN");
-        setListedIn(coluns.length > 10 && !coluns[10].isEmpty() ? coluns[10].split(", ") : new String[]{"NaN"});
-        if (getListedIn().length > 1) ordenar(getListedIn());
+    
+        int release_year = (coluns.length > 7 && !coluns[7].isEmpty()) ? Integer.parseInt(coluns[7]) : 0;
+        String rating = (coluns.length > 8 && !coluns[8].isEmpty()) ? coluns[8] : "NaN";
+        String duration = (coluns.length > 9 && !coluns[9].isEmpty()) ? coluns[9] : "NaN";
+        String[] listed_in = (coluns.length > 10 && !coluns[10].isEmpty()) ? coluns[10].split(", ") : new String[]{"NaN"};
+        if (listed_in.length > 1) ordenar(listed_in);
+    
+        Show show = new Show(show_id, type, title, director, cast, country, date_added, release_year, rating, duration, listed_in);
     }
     
     // Converte a string de entrada no índice do CSV
@@ -222,19 +243,22 @@ public class Show {
             multiplicador *= 10;
         }
         return valor;
+    }    
+
+    public static boolean validacao(Show A, Show B) {
+        if (A != null && B != null) {
+            int cmp = A.getDuration().compareToIgnoreCase(B.getDuration());
+    
+            if (cmp != 0) return cmp < 0;
+    
+            return A.getTitle().compareToIgnoreCase(B.getTitle()) < 0;       
+        }
+
+        return false;
     }
 
-    public static void swap(Show[] heap, int i, int j) {
-        Show temp = heap[i];
-        heap[i] = heap[j];
-        heap[j] = temp;
-        movimentacoes += 3;
-    }
-
-    public static void intercalar(Show [] s, int esq, meio, int dir) {
-        int n1 = 0,
-            n2 = 0,
-            i = 0,
+    public static void intercalar(Show[] s, int esq, int meio, int dir) {
+        int i = 0,
             j = 0,
             k = 0,
             n1 = meio - esq + 1,
@@ -242,7 +266,7 @@ public class Show {
             
         Show[] a1 = new Show[n1+1];
         Show[] a2 = new Show[n2+1];
-        
+       
         while (i < n1) {
             a1[i] = s[esq + i];
             i++;
@@ -253,15 +277,19 @@ public class Show {
             j++;
         }
 
-        a[i] = 0x7FFFFFFF;
-        a[j] = 0x7FFFFFFF;
-
         i = 0; j = 0; k = esq;
+        while (i < n1 && j < n2) {
+            if (validacao(a1[i], a2[j])) {
+                s[k++] = a1[i++];
+            }
+            else {
+                s[k++] = a2[j++];
+            }
+    }
 
-        while (k <= dir) {
-            array[k] = (a1[i] <= a2[j]) ? a1[i++] : a2[j++];
-            k++;
-        }
+        // Copia o que sobrou
+        while (i < n1) s[k++] = a1[i++];
+        while (j < n2) s[k++] = a2[j++];
     }
 
     public static void mergesort(Show[] s, int esq, int dir) {
@@ -299,7 +327,7 @@ public class Show {
         double tempo = (end - start) / 1e6; // em milissegundos
 
         for (int i = 0; i < cont; i++) {
-            shows[i].imprimir();    
+            if (shows[i] != null) shows[i].imprimir();    
         }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
