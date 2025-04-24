@@ -30,6 +30,22 @@ public class Show {
 
     public Show() {}
 
+    public Show(String show_id, String type, String title, String director, 
+           String[] cast, String country, Date date_added, int release_year, 
+           String rating, String duration, String[] listed_in) {
+        setShowId(show_id);
+        setType(type);
+        setTitle(title);
+        setDirector(director);
+        setCast(cast);
+        setCountry(country);
+        setDateAdded(date_added);
+        setReleaseYear(release_year);
+        setRating(rating);
+        setDuration(duration);
+        setListedIn(listed_in);
+    }
+
     public void setShowId(String show_id) {
         this.show_id = show_id;
     }
@@ -224,106 +240,71 @@ public class Show {
         return valor;
     }
 
-    public static void swap(Show[] heap, int i, int j) {
-        Show temp = heap[i];
-        heap[i] = heap[j];
-        heap[j] = temp;
-        movimentacoes += 3;
-    }
-    
-    public static boolean diretorMenor(Show a, Show b) {
-        boolean vazioA = (a.getDirector() == null || a.getDirector().isEmpty());
-        boolean vazioB = (b.getDirector() == null || b.getDirector().isEmpty());
+    public static boolean validacaoAno(int A, int B) {
+        boolean cmp = false;
 
-        if (vazioA && vazioB) {
-            return false;
+        if (A == B) {
+            cmp = true;
         }
-        if (vazioA) { 
-            comparacoes++; 
-            return false; 
-        }
-        if (vazioB) { 
-            comparacoes++; 
-            return true; 
-        }
-    
-        String dirA = a.getDirector();
-        String dirB = b.getDirector();
-    
-        comparacoes++;
-        int comp = dirA.compareToIgnoreCase(dirB);
-        if (comp != 0) return comp < 0;
-    
-        // Desempate por título
-        String titleA = a.getTitle();
-        String titleB = b.getTitle();
-    
-        comparacoes++;
-        return titleA.compareToIgnoreCase(titleB) < 0;
+
+        return cmp;
     }
+
+    public static boolean validacaoTitle(Show A, Show B) {
+        if (A != null && B != null) {
+            comparacoes++;
+            int cmp = (A.release_year > B.release_year) ? -1 : 1;
     
-    public static int getMaiorFilho(Show[] heap, int i, int tamHeap) {
-        int filhoEsq = 2 * i;
-        int filhoDir = 2 * i + 1;
-        int maiorFilho = 0;
+            if (cmp != 0) return cmp < 0;
     
-        comparacoes++;
-        if (filhoDir > tamHeap) {
-            maiorFilho = filhoEsq;
-        } else {
-            if (diretorMenor(heap[filhoEsq], heap[filhoDir])) {
-                maiorFilho = filhoDir;
-            } else {
-                maiorFilho = filhoEsq;
+            comparacoes++;
+            return A.getTitle().compareToIgnoreCase(B.getTitle()) < 0;       
+        }
+
+        return false;
+    }
+
+    public static int getMaiorAno(Show[] s, int n) {
+        int maior = s[0].getReleaseYear(),
+            i = 0;
+
+        while (i < n) {
+            if (s[i].getReleaseYear() > maior) {
+                maior = s[i].getReleaseYear();
             }
+            i++;
         }
-    
-        return maiorFilho;
+
+        return maior;
     }
-    
-    public static void reconstruir(Show[] heap, int tamHeap) {
-        int i = 1;
-        while (i <= tamHeap / 2) {
-            int filho = getMaiorFilho(heap, i, tamHeap);
-    
-            if (!diretorMenor(heap[filho], heap[i])) {
-                swap(heap, i, filho);
-                i = filho;
-            } else {
-                i = tamHeap;
+
+    public static void countingsort(Show[] s, int n) {
+        int[] count = new int[getMaiorAno(s, n) + 1];
+        Show[] ordenado = new Show[n];
+
+        for(int i = 0; i < count.length; count[i++] = 0);
+			
+        for(int i = 0; i < n; count[s[i].getReleaseYear()]++, i++);
+
+        for(int i = 1; i < count.length; count[i] += count[i - 1] , i++);
+
+        for(int i = n-1; i >= 0; ordenado[count[s[i].getReleaseYear()] -1] = s[i], count[s[i].getReleaseYear()]--, i--, movimentacoes++);
+
+        for(int i = 1; i < n; i++) {
+            Show tmp = ordenado[i];
+            int j = i-1;
+
+            while (j >= 0 && validacaoAno(tmp[i].getReleaseYear(), ordenado[j].getReleaseYear()) && 
+                  validacaoTitle(tmp[i].getTitle(), ordenado[j].getTitle())) {
+                comparacoes += 2;
+                ordenado[j + 1] = ordenado[j];
+                movimentacoes++;
+                j--;
             }
-        }
-    }
-    
-    public static void construir(Show[] heap, int tamHeap) {
-        int i = tamHeap;
-        while (i > 1 && diretorMenor(heap[i / 2], heap[i])) {
-            swap(heap, i, i / 2);
-            i /= 2;
-        }
-    }
-    
-    public static void heapsort(Show[] shows, int n) {
-        Show[] heap = new Show[n + 1];
-        for (int i = 0; i < n; i++) {
-            heap[i + 1] = shows[i];
-            movimentacoes++;
-        }
-    
-        int tamHeap = 2;
-        while (tamHeap <= n) {
-            construir(heap, tamHeap++);
-        }
-    
-        tamHeap = n;
-        while (tamHeap > 1) {
-            swap(heap, 1, tamHeap--);
-            reconstruir(heap, tamHeap);
-        }
-    
-        for (int i = 0; i < n; i++) {
-            shows[i] = heap[i + 1];
-            movimentacoes++;
+            if(i != (j + 1)){
+                movimentacoes++;
+                ordenado[j + 1] = tmp;
+            }
         }
     }
     
@@ -348,7 +329,7 @@ public class Show {
         }
 
         long start = System.nanoTime();
-        Show.heapsort(shows, cont);
+        Show.countingsort(shows, cont);
         long end = System.nanoTime();
         double tempo = (end - start) / 1e6; // em milissegundos
 
