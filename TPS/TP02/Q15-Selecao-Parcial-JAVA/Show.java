@@ -30,6 +30,21 @@ public class Show {
 
     public Show() {}
 
+    public Show(String show_id, String type, String title, String director, String[] cast, String country,
+                Date date_added, int release_year, String rating, String duration, String[] listed_in) {
+        this.show_id = show_id;
+        this.type = type;
+        this.title = title;
+        this.director = director;
+        this.cast = cast;
+        this.country = country;
+        this.date_added = date_added;
+        this.release_year = release_year;
+        this.rating = rating;
+        this.duration = duration;
+        this.listed_in = listed_in;
+    }
+
     public void setShowId(String show_id) {
         this.show_id = show_id;
     }
@@ -155,6 +170,12 @@ public class Show {
             System.err.println("Erro ao carregar o arquivo: " + e.getMessage());
         }
     }
+
+    public static void swap(Show[] shows, int i, int j) {
+        Show temp = shows[i];
+        shows[i] = shows[j];
+        shows[j] = temp;
+    }
     
     public static void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
@@ -224,13 +245,6 @@ public class Show {
         return valor;
     }
 
-    public static void swap(Show[] shows, int menor, int i) {
-        Show temp = shows[i];
-        shows[i] = shows[menor];
-        shows[menor] = temp;
-        movimentacoes += 3;
-    }
-
     public static void selecao(Show[] shows, int n) {  
         for (int i=0; i < n; i++) {
             int menor = i;
@@ -241,7 +255,7 @@ public class Show {
                     menor = j;
                 }
             }
-            swap(shows, menor, i);
+            swap(shows, menor, i); movimentacoes += 3;
         }
     }
 

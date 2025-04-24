@@ -537,32 +537,49 @@ int convert_str_to_int(char *str) {
     
     return value;
 }
-/*
-    FALTA IMPLEMENTAR O INSERÇÃO
-*/
+
+char *strdup_lower(const char *src) {
+    char *dup = strdup(src);             
+    if (!dup) exit(1);
+    for (int i = 0; dup[i]; i++) {
+        dup[i] = tolower((unsigned char)dup[i]);
+    }
+    return dup;
+}
+
+int validacao(Show A, Show B) {
+    int resp = 0;
+
+    if (strcmp(A.type, B.type) == 0) {
+        char *lowA = strdup_lower(A.title);
+        char *lowB = strdup_lower(B.title);
+
+        resp = strcmp(lowA, lowB);
+        comparacoes += 2;
+
+        free(lowA);
+        free(lowB);
+    } 
+    else {
+        resp = strcmp(A.type, B.type); 
+        comparacoes++;
+    }
+
+    return resp;
+}
+
 void insercaoParcial(Show *s, int n, int cont) {
     for (int i = 1; i < n; i++) {
         Show temp = s[i];
         int j = (i < 10) ? i - 1 : 10 - 1;
 
-        while ((j >= 0) &&
-        (strcmp(temp.type, s[j].type) < 0 || 
-        (strcmp(temp.type, s[j].type) == 0 && strcmp(temp.title, s[j].title) < 0))) {
-      
-            if (strcmp(temp.type, s[j].type) < 0) {
-                comparacoes++;
-            }
-            else {
-                comparacoes += 3;
-            }
-
+        while ((j >= 0) && validacao(temp, s[j]) < 0) {
             s[j+1] = s[j];
             movimentacoes++;
             j--;
         }
         s[j+1] = temp;
         movimentacoes++;      
-        
     }
 }
 
@@ -575,7 +592,7 @@ int main() {
     Show shows[MAX_SHOWS];
     int count = 0;
     
-    read_file("../tmp/disneyplus.csv");
+    read_file("/tmp/disneyplus.csv");
     
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 

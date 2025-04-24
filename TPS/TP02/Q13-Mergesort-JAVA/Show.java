@@ -171,6 +171,12 @@ public class Show {
         }
     }
     
+    public static void swap(Show[] shows, int i, int j) {
+        Show temp = shows[i];
+        shows[i] = shows[j];
+        shows[j] = temp;
+    }
+    
     public static void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {

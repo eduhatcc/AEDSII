@@ -30,6 +30,21 @@ public class Show {
 
     public Show() {}
 
+    public Show(String show_id, String type, String title, String director, String[] cast, String country,
+                Date date_added, int release_year, String rating, String duration, String[] listed_in) {
+        this.show_id = show_id;
+        this.type = type;
+        this.title = title;
+        this.director = director;
+        this.cast = cast;
+        this.country = country;
+        this.date_added = date_added;
+        this.release_year = release_year;
+        this.rating = rating;
+        this.duration = duration;
+        this.listed_in = listed_in;
+    }
+
     public void setShowId(String show_id) {
         this.show_id = show_id;
     }
@@ -156,6 +171,12 @@ public class Show {
         }
     }
     
+    public static void swap(Show[] shows, int i, int j) {
+        Show temp = shows[i];
+        shows[i] = shows[j];
+        shows[j] = temp;
+    }
+
     public static void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
@@ -223,13 +244,6 @@ public class Show {
         }
         return valor;
     }
-
-    public static void swap(Show[] heap, int i, int j) {
-        Show temp = heap[i];
-        heap[i] = heap[j];
-        heap[j] = temp;
-        movimentacoes += 3;
-    }
     
     public static boolean diretorMenor(Show a, Show b) {
         boolean vazioA = (a.getDirector() == null || a.getDirector().isEmpty());
@@ -287,7 +301,7 @@ public class Show {
             int filho = getMaiorFilho(heap, i, tamHeap);
     
             if (!diretorMenor(heap[filho], heap[i])) {
-                swap(heap, i, filho);
+                swap(heap, i, filho); movimentacoes += 3;
                 i = filho;
             } else {
                 i = tamHeap;
@@ -298,7 +312,7 @@ public class Show {
     public static void construir(Show[] heap, int tamHeap) {
         int i = tamHeap;
         while (i > 1 && diretorMenor(heap[i / 2], heap[i])) {
-            swap(heap, i, i / 2);
+            swap(heap, i, i / 2); movimentacoes += 3;
             i /= 2;
         }
     }
@@ -317,7 +331,7 @@ public class Show {
     
         tamHeap = n;
         while (tamHeap > 1) {
-            swap(heap, 1, tamHeap--);
+            swap(heap, 1, tamHeap--); movimentacoes += 3;
             reconstruir(heap, tamHeap);
         }
     
@@ -327,7 +341,6 @@ public class Show {
         }
     }
     
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();

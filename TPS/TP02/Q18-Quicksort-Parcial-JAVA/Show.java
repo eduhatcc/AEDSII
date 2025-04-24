@@ -31,6 +31,21 @@ public class Show {
 
     public Show() {}
 
+    public Show(String show_id, String type, String title, String director, String[] cast, String country,
+                Date date_added, int release_year, String rating, String duration, String[] listed_in) {
+        this.show_id = show_id;
+        this.type = type;
+        this.title = title;
+        this.director = director;
+        this.cast = cast;
+        this.country = country;
+        this.date_added = date_added;
+        this.release_year = release_year;
+        this.rating = rating;
+        this.duration = duration;
+        this.listed_in = listed_in;
+    }
+
     public void setShowId(String show_id) {
         this.show_id = show_id;
     }
@@ -157,6 +172,12 @@ public class Show {
         }
     }
     
+    public static void swap(Show[] shows, int i, int j) {
+        Show temp = shows[i];
+        shows[i] = shows[j];
+        shows[j] = temp;
+    }
+
     public static void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
@@ -225,13 +246,6 @@ public class Show {
         return valor;
     }
 
-    public static void swap(Show[] shows, int i, int j) {
-        Show temp = shows[i];
-        shows[i] = shows[j];
-        shows[j] = temp;
-        movimentacoes += 3;
-    }
-
     public static int datecmp(LocalDate dateA, LocalDate dateB) {
         return dateA.compareTo(dateB);
     }
@@ -267,9 +281,7 @@ public class Show {
             while (validacao(shows[j], meio) > 0) j--;
 
             if (i <= j) {
-                swap(shows, i, j);
-                i++;
-                j--;
+                swap(shows, i, j); movimentacoes += 3; i++; j--;
             }
         }
         

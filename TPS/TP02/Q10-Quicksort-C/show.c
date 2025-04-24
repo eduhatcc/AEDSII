@@ -547,10 +547,10 @@ char *strdup_lower(const char *src) {
     return dup;
 }
 
-void swap(Show *heap, int i, int j) {
-    Show tmp = heap[i];
-    heap[i] = heap[j];
-    heap[j] = tmp;
+void swap(Show *s, int i, int j) {
+    Show tmp = s[i];
+    s[i] = s[j];
+    s[j] = tmp;
     movimentacoes += 3;
 }
 
