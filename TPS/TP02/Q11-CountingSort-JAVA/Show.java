@@ -16,7 +16,7 @@ public class Show {
     private String listed_in[];
     
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "../tmp/disneyplus.csv";
+    private static String arq = "/tmp/disneyplus.csv";
     private static List<String> csv = new ArrayList<>();
     
     public static String log = "874201_countingsort.txt";
@@ -172,6 +172,12 @@ public class Show {
         }
     }
     
+    public static void swap(Show[] shows, int i, int j) {
+        Show temp = shows[i];
+        shows[i] = shows[j];
+        shows[j] = temp;
+    }
+
     public static void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
@@ -240,30 +246,6 @@ public class Show {
         return valor;
     }
 
-    public static boolean validacaoAno(int A, int B) {
-        boolean cmp = false;
-
-        if (A == B) {
-            cmp = true;
-        }
-
-        return cmp;
-    }
-
-    public static boolean validacaoTitle(Show A, Show B) {
-        if (A != null && B != null) {
-            comparacoes++;
-            int cmp = (A.release_year > B.release_year) ? -1 : 1;
-    
-            if (cmp != 0) return cmp < 0;
-    
-            comparacoes++;
-            return A.getTitle().compareToIgnoreCase(B.getTitle()) < 0;       
-        }
-
-        return false;
-    }
-
     public static int getMaiorAno(Show[] s, int n) {
         int maior = s[0].getReleaseYear(),
             i = 0;
@@ -279,34 +261,57 @@ public class Show {
     }
 
     public static void countingsort(Show[] s, int n) {
-        int[] count = new int[getMaiorAno(s, n) + 1];
+        int[] count = new int[getMaiorAno(s, n) +1];
         Show[] ordenado = new Show[n];
-
-        for(int i = 0; i < count.length; count[i++] = 0);
-			
-        for(int i = 0; i < n; count[s[i].getReleaseYear()]++, i++);
-
-        for(int i = 1; i < count.length; count[i] += count[i - 1] , i++);
-
-        for(int i = n-1; i >= 0; ordenado[count[s[i].getReleaseYear()] -1] = s[i], count[s[i].getReleaseYear()]--, i--, movimentacoes++);
-
-        for(int i = 1; i < n; i++) {
+        int tam = count.length;
+    
+        // inicializa count
+        for (int i = 0; i < tam; i++) {
+            count[i] = 0;
+        }
+    
+        // conta ocorrências por ano
+        for (int i = 0; i < n; i++) {
+            count[s[i].getReleaseYear()]++;
+        }
+    
+        // prefix sum
+        for (int i = 1; i < tam; i++) {
+            count[i] += count[i-1];
+        }
+    
+        // monta o array ordenado (estável)
+        for (int i = n - 1; i >= 0; i--) {
+            int ano = s[i].getReleaseYear();
+            ordenado[ count[ano] -1 ] = s[i];
+            count[ano]--;
+            movimentacoes++;
+        }
+    
+        // para itens de mesmo ano, faz ordenação por título (insertion sort)
+        for (int i = 1; i < n; i++) {
             Show tmp = ordenado[i];
             int j = i-1;
 
-            while (j >= 0 && validacaoAno(tmp[i].getReleaseYear(), ordenado[j].getReleaseYear()) && 
-                  validacaoTitle(tmp[i].getTitle(), ordenado[j].getTitle())) {
-                comparacoes += 2;
-                ordenado[j + 1] = ordenado[j];
+            while (j >= 0 && ordenado[j].getReleaseYear() == tmp.getReleaseYear()
+                   && tmp.getTitle().compareToIgnoreCase(ordenado[j].getTitle()) < 0) {
+                comparacoes += 2;       
+                ordenado[j+1] = ordenado[j];
                 movimentacoes++;
                 j--;
             }
-            if(i != (j + 1)){
-                movimentacoes++;
+            if (j+1 != i) {
                 ordenado[j + 1] = tmp;
+                movimentacoes++;
             }
         }
+    
+        // Copia para o array original
+        for (int i = 0; i < n; i++) {
+            s[i] = ordenado[i];
+        }
     }
+    
     
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
