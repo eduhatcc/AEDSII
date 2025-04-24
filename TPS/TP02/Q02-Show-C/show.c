@@ -4,11 +4,14 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <time.h>
+
 #define MAX_LINE_SIZE 2000
 #define MAX_SHOWS 1000
 
 char **csv_lines = NULL;
-int csv_line_count = 0;
+int csv_line_count = 0,
+    comparacoes = 0,
+    movimentacoes = 0;
 
 typedef struct {
     char show_id[50];
@@ -16,30 +19,36 @@ typedef struct {
     char title[200];
     char director[200];
     char **cast;
-    int cast_count;
+    int castCount;
     char country[100];
-    struct tm *date_added;
-    int release_year;
+    struct tm *dateAdded;
+    int releaseYear;
     char rating[20];
     char duration[50];
-    char **listed_in;
-    int listed_in_count;
+    char **listedIn;
+    int listedInCount;
 } Show;
 
 void init_show(Show *show) {
-    strcpy(show->show_id, "");
-    strcpy(show->type, "");
-    strcpy(show->title, "");
-    strcpy(show->director, "");
-    strcpy(show->country, "");
-    show->cast = NULL;
-    show->cast_count = 0;
-    show->date_added = NULL;
-    show->release_year = 0;
-    strcpy(show->rating, "");
-    strcpy(show->duration, "");
-    show->listed_in = NULL;
-    show->listed_in_count = 0;
+    strcpy(show->show_id, "NaN");
+    strcpy(show->type, "NaN");
+    strcpy(show->title, "NaN");
+    strcpy(show->director, "NaN");
+    strcpy(show->country, "NaN");
+    show->cast = malloc(sizeof(char *));
+    show->cast[0] = strdup("NaN");
+    show->castCount = 1;
+    show->dateAdded = malloc(sizeof(struct tm));
+    memset(show->dateAdded, 0, sizeof(struct tm));
+    show->dateAdded->tm_mday = 1;  // Dia 1
+    show->dateAdded->tm_mon = 2;   // Março
+    show->dateAdded->tm_year = 0;  // 1900
+    show->releaseYear = 0;
+    strcpy(show->rating, "NaN");
+    strcpy(show->duration, "NaN");
+    show->listedIn = malloc(sizeof(char *));
+    show->listedIn[0] = strdup("NaN");
+    show->listedInCount = 1;
 }
 
 void read_file(const char *filename) {
@@ -317,10 +326,10 @@ void read_show(Show *show, char *line) {
         
         // Cast
         if (fields[4] && strlen(fields[4]) > 0) {
-            show->cast = split_and_sort(fields[4], &show->cast_count);
+            show->cast = split_and_sort(fields[4], &show->castCount);
         } else {
             show->cast = NULL;
-            show->cast_count = 0;
+            show->castCount = 0;
         }
         
         // Country
@@ -330,9 +339,9 @@ void read_show(Show *show, char *line) {
         
         // Date added
         if (fields[6] && strlen(fields[6]) > 0) {
-            show->date_added = (struct tm *)malloc(sizeof(struct tm));
-            if (show->date_added != NULL) {
-                memset(show->date_added, 0, sizeof(struct tm));
+            show->dateAdded = malloc(sizeof(struct tm));
+            if (show->dateAdded != NULL) {
+                memset(show->dateAdded, 0, sizeof(struct tm));
                 
                 // Date format: "Month day, year"
                 char month_str[20] = {0};
@@ -351,17 +360,23 @@ void read_show(Show *show, char *line) {
                     }
                 }
                 
-                show->date_added->tm_year = year - 1900;
-                show->date_added->tm_mon = month;
-                show->date_added->tm_mday = day;
+                show->dateAdded->tm_year = year - 1900;
+                show->dateAdded->tm_mon = month;
+                show->dateAdded->tm_mday = day;
             }
         } else {
-            show->date_added = NULL;
+            show->dateAdded = malloc(sizeof(struct tm));
+            if (show->dateAdded != NULL) {
+                memset(show->dateAdded, 0, sizeof(struct tm));
+                show->dateAdded->tm_year = 0;  // 1900
+                show->dateAdded->tm_mon = 2;   // Março
+                show->dateAdded->tm_mday = 1;  // Dia 1
+            }
         }
         
         // Release year
         if (fields[7] && strlen(fields[7]) > 0) {
-            show->release_year = atoi(fields[7]);
+            show->releaseYear = atoi(fields[7]);
         }
         
         // Rating
@@ -376,10 +391,10 @@ void read_show(Show *show, char *line) {
         
         // Listed in
         if (fields[10] && strlen(fields[10]) > 0) {
-            show->listed_in = split_and_sort(fields[10], &show->listed_in_count);
+            show->listedIn = split_and_sort(fields[10], &show->listedInCount);
         } else {
-            show->listed_in = NULL;
-            show->listed_in_count = 0;
+            show->listedIn = NULL;
+            show->listedInCount = 0;
         }
         
         // Free fields
@@ -404,60 +419,52 @@ void print_show(Show *show) {
            show->type);
     
     // Director
-    if (strlen(show->director) == 0) {
-        printf("NaN ## ");
-    } else {
-        printf("%s ## ", show->director);
-    }
+    printf("%s ## ", show->director);
     
     // Cast
-    if (show->cast_count == 0 || show->cast == NULL) {
+    if (show->castCount == 0 || show->cast == NULL) {
         printf("[NaN] ## ");
     } else {
         printf("[");
-        for (int i = 0; i < show->cast_count; i++) {
+        for (int i = 0; i < show->castCount; i++) {
             if (show->cast[i] != NULL) {
                 printf("%s", show->cast[i]);
-                if (i < show->cast_count - 1) printf(", ");
+                if (i < show->castCount - 1) printf(", ");
             }
         }
         printf("] ## ");
     }
     
     // Country
-    if (strlen(show->country) == 0) {
-        printf("NaN ## ");
-    } else {
-        printf("%s ## ", show->country);
-    }
+    printf("%s ## ", show->country);
     
     // Date added
-    if (show->date_added == NULL) {
-        printf("NaN ## ");
+    if (show->dateAdded == NULL) {
+        printf(" ## ");
     } else {
         const char *months[] = {"January", "February", "March", "April", "May", "June", 
                                "July", "August", "September", "October", "November", "December"};
         printf("%s %d, %d ## ", 
-               months[show->date_added->tm_mon],
-               show->date_added->tm_mday,
-               show->date_added->tm_year + 1900);
+               months[show->dateAdded->tm_mon],
+               show->dateAdded->tm_mday,
+               show->dateAdded->tm_year + 1900);
     }
     
     // Release year, rating, duration
     printf("%d ## %s ## %s ## ", 
-           show->release_year, 
+           show->releaseYear, 
            show->rating, 
            show->duration);
     
     // Listed in
-    if (show->listed_in_count == 0 || show->listed_in == NULL) {
+    if (show->listedInCount == 0 || show->listedIn == NULL) {
         printf("[NaN] ##");
     } else {
         printf("[");
-        for (int i = 0; i < show->listed_in_count; i++) {
-            if (show->listed_in[i] != NULL) {
-                printf("%s", show->listed_in[i]);
-                if (i < show->listed_in_count - 1) printf(", ");
+        for (int i = 0; i < show->listedInCount; i++) {
+            if (show->listedIn[i] != NULL) {
+                printf("%s", show->listedIn[i]);
+                if (i < show->listedInCount - 1) printf(", ");
             }
         }
         printf("] ##");
@@ -472,7 +479,7 @@ void free_show(Show *show) {
     
     // Free cast array
     if (show->cast != NULL) {
-        for (int i = 0; i < show->cast_count; i++) {
+        for (int i = 0; i < show->castCount; i++) {
             if (show->cast[i] != NULL) {
                 free(show->cast[i]);
             }
@@ -481,21 +488,21 @@ void free_show(Show *show) {
         show->cast = NULL;
     }
     
-    // Free listed_in array
-    if (show->listed_in != NULL) {
-        for (int i = 0; i < show->listed_in_count; i++) {
-            if (show->listed_in[i] != NULL) {
-                free(show->listed_in[i]);
+    // Free listedIn array
+    if (show->listedIn != NULL) {
+        for (int i = 0; i < show->listedInCount; i++) {
+            if (show->listedIn[i] != NULL) {
+                free(show->listedIn[i]);
             }
         }
-        free(show->listed_in);
-        show->listed_in = NULL;
+        free(show->listedIn);
+        show->listedIn = NULL;
     }
     
     // Free date
-    if (show->date_added != NULL) {
-        free(show->date_added);
-        show->date_added = NULL;
+    if (show->dateAdded != NULL) {
+        free(show->dateAdded);
+        show->dateAdded = NULL;
     }
 }
 
@@ -531,16 +538,29 @@ int convert_str_to_int(char *str) {
     return value;
 }
 
+// Convert string to lowercase
+char *strdup_lower(const char *src) {
+    char *dup = strdup(src);             
+    if (!dup) exit(1);
+    for (int i = 0; dup[i]; i++) {
+        dup[i] = tolower((unsigned char)dup[i]);
+    }
+    return dup;
+}
+
+// Main function
 int main() {
     char input[100];
     Show shows[MAX_SHOWS];
     int count = 0;
     
-    read_file("/tmp/disneyplus.csv");
+    read_file("../tmp/disneyplus.csv");
     
+    // Read input from file
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 
-        
+    
+        // Check if input is "FIM"
         while (!is_end(input)) {
             int index = convert_str_to_int(input);
             
@@ -550,10 +570,12 @@ int main() {
                 count++;
             }
             
+            // Check if we reached the maximum number of shows
             if (fgets(input, sizeof(input), stdin) == NULL) break;
             input[strcspn(input, "\n")] = 0; 
         }
 
+        // Print shows
         for (int i = 0; i < count; i++) {
             print_show(&shows[i]);
             free_show(&shows[i]);
