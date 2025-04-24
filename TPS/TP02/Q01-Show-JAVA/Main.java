@@ -2,7 +2,7 @@ import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 
-public class Show {
+class Show {
     private String show_id;
     private String type;
     private String title;                                
@@ -15,15 +15,34 @@ public class Show {
     private String duration;
     private String listed_in[];
     
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "/tmp/disneyplus.csv";
-    private static List<String> csv = new ArrayList<>();
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
+    private String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
-    public static List<String> getcsv() {
+    // Método para obter o caminho do arquivo CSV
+    public List<String> getcsv() {
         return csv;
     }
 
+    // Construtor vazio
     public Show() {}
+
+    // Construtor com parâmetros completos
+    public Show(String show_id, String type, String title, String director, 
+           String[] cast, String country, Date date_added, int release_year, 
+           String rating, String duration, String[] listed_in) {
+        setShowId(show_id);
+        setType(type);
+        setTitle(title);
+        setDirector(director);
+        setCast(cast);
+        setCountry(country);
+        setDateAdded(date_added);
+        setReleaseYear(release_year);
+        setRating(rating);
+        setDuration(duration);
+        setListedIn(listed_in);
+    }
 
     public void setShowId(String show_id) {
         this.show_id = show_id;
@@ -121,30 +140,24 @@ public class Show {
 
     // Método imprimir utilizando os getters e tratando valores nulos ou vazios
     public void imprimir() {
-        String id = (getShowId() != null && !getShowId().isEmpty()) ? getShowId() : "NaN";
-        String titulo = (getTitle() != null && !getTitle().isEmpty()) ? getTitle() : "NaN";
-        String tipo = (getType() != null && !getType().isEmpty()) ? getType() : "NaN";
-        String diretor = (getDirector() != null && !getDirector().isEmpty()) ? getDirector() : "NaN";
-        String pais = (getCountry() != null && !getCountry().isEmpty()) ? getCountry() : "NaN";
-        String data = (getDateAdded() != null)
-            ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
-            : "NaN";
-        String classificacao = (getRating() != null && !getRating().isEmpty()) ? getRating() : "NaN";
-        String duracao = (getDuration() != null && !getDuration().isEmpty()) ? getDuration() : "NaN";
+        String dateAdded = (getDateAdded() != null)
+        ? new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).format(getDateAdded())
+        : "March 1, 1900";
+        
+        String[] casts = getCast();
+        String castStr = Arrays.toString(casts);
 
-        String[] elenco = getCast() != null ? getCast() : new String[0];
-        String elencoStr = (elenco.length == 0) ? "[NaN]" : Arrays.toString(elenco);
+        String[] listedIn = getListedIn();
+        String listedInStr = Arrays.toString(listedIn);
 
-        String[] categorias = getListedIn() != null ? getListedIn() : new String[0];
-        String categoriasStr = (categorias.length == 0) ? "[NaN]" : Arrays.toString(categorias);
-
-        System.out.println("=> " + id + " ## " + titulo + " ## " + tipo + " ## " +
-            diretor + " ## " + elencoStr + " ## " + pais + " ## " +
-            data + " ## " + getReleaseYear() + " ## " + classificacao + " ## " +
-            duracao + " ## " + categoriasStr + " ##");
+        System.out.println("=> " + getShowId() + " ## " + getTitle() + " ## " + getType() + " ## " +
+            getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
+            dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
+            getDuration() + " ## " + listedInStr + " ##");
     }
     
-    public static void preencher() {
+    // Método para preencher a lista csv com os dados do arquivo CSV
+    public void preencher() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(arq));
             String line;
@@ -152,12 +165,21 @@ public class Show {
                 csv.add(line);
             }
             br.close();
-        } catch(IOException e) {
+        } 
+        catch(IOException e) {
             System.err.println("Erro ao carregar o arquivo: " + e.getMessage());
         }
     }
     
-    public static void ordenar(String[] array) {
+    // Método para trocar dois elementos no array de shows
+    public void swap(Show[] shows, int i, int j) {
+        Show temp = shows[i];
+        shows[i] = shows[j];
+        shows[j] = temp;
+    }
+
+    // Método para ordenar o array de shows 
+    public void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
                 if (array[i].compareTo(array[j]) > 0) {               
@@ -169,6 +191,7 @@ public class Show {
         }
     }
     
+    // Método para ler uma linha do CSV e preencher os atributos do show
     public void ler(String line) {
         List<String> array = new ArrayList<>();
         boolean aspas = false;
@@ -180,39 +203,40 @@ public class Show {
             
             if (c == '"') {
                 aspas = !aspas;
-            } else if (c == ',' && !aspas) {
+            } 
+            else if (c == ',' && !aspas) {
                 array.add(str.toString());
                 str.setLength(0);
-            } else {
+            } 
+            else {
                 str.append(c);
             }
         }
-        array.add(str.toString());
+        array.add(str.toString()); // Adiciona o último campo
 
-        String[] coluns = array.toArray(new String[0]);
+        String[] coluns = array.toArray(new String[0]); // Converte para array
 
-        setShowId(coluns.length > 0 ? coluns[0] : "");
+        setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
-        setTitle(coluns.length > 2 ? coluns[2] : "");
-        setDirector(coluns.length > 3 ? coluns[3] : "");
-        setCast(coluns.length > 4 && !coluns[4].equals("") ? coluns[4].split(", ") : new String[0]);
-        if (getCast() != null && getCast().length > 1) ordenar(getCast());
-        setCountry(coluns.length > 5 ? coluns[5] : "");
+        setTitle(coluns.length > 2 && !coluns[2].isEmpty() ? coluns[2] : "NaN");
+        setDirector(coluns.length > 3 && !coluns[3].isEmpty() ? coluns[3] : "NaN");
+        setCast(coluns.length > 4 && !coluns[4].isEmpty() ? coluns[4].split(", ") : new String[]{"NaN"});
+        if (getCast().length > 1) ordenar(getCast());
+        setCountry(coluns.length > 5 && !coluns[5].isEmpty() ? coluns[5] : "NaN");
         try {
-            setDateAdded(coluns.length > 6 && !coluns[6].equals("") ? dateFormat.parse(coluns[6]) : null);
+            setDateAdded(coluns.length > 6 && !coluns[6].isEmpty() ? dateFormat.parse(coluns[6]) : null);
         } catch (Exception e) {
             setDateAdded(null);
         }
-        setReleaseYear(coluns.length > 7 && !coluns[7].equals("") ? Integer.parseInt(coluns[7]) : 0);
-        setRating(coluns.length > 8 ? coluns[8] : "");
-        setDuration(coluns.length > 9 ? coluns[9] : "");
-        setListedIn(coluns.length > 10 && !coluns[10].equals("") ? coluns[10].split(", ") : new String[0]);
-        if (getListedIn() != null && getListedIn().length > 1) ordenar(getListedIn());
+        setReleaseYear(coluns.length > 7 && !coluns[7].isEmpty() ? Integer.parseInt(coluns[7]) : 0);
+        setRating(coluns.length > 8 && !coluns[8].isEmpty() ? coluns[8] : "NaN");
+        setDuration(coluns.length > 9 && !coluns[9].isEmpty() ? coluns[9] : "NaN");
+        setListedIn(coluns.length > 10 && !coluns[10].isEmpty() ? coluns[10].split(", ") : new String[]{"NaN"});
+        if (getListedIn().length > 1) ordenar(getListedIn());
     }
     
     // Converte a string de entrada no índice do CSV
-    // Agora ignora o primeiro caractere ("s")
-    public static int converteStr(String input) {
+    public int converteStr(String input) {
         int valor = 0;
         int multiplicador = 1;
         for (int i = input.length() - 1; i >= 1; i--) {
@@ -222,15 +246,18 @@ public class Show {
         }
         return valor;
     }
-    
+}
+
+public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();
         Show[] shows = new Show[1700];
         int cont = 0;
 
-        Show.preencher();
-        List<String> lines = Show.getcsv();
+        preencher();
+
+        List<String> lines = getcsv();
 
         while (!input.equals("FIM")) {
             int index = converteStr(input);
