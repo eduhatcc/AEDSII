@@ -3,7 +3,106 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.*;
 
-public class Show {
+public class Main {
+
+    // Função para comparar duas datas
+    // Retorna 0 se forem iguais, -1 se dateA < dateB e 1 se dateA > dateB
+    public static int datecmp(LocalDate dateA, LocalDate dateB) {
+        return dateA.compareTo(dateB);
+    }
+
+    // Função de comparação para o quicksort
+    // Retorna -1 se dateA < dateB, 0 se forem iguais e 1 se dateA > dateB
+    public static int validacao(Show dateA, Show dateB) {
+        int resp = 0;
+
+        LocalDate localDateA = dateA.getDateAdded() != null ? dateA.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
+        LocalDate localDateB = dateB.getDateAdded() != null ? dateB.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
+                                                                                                                    
+        int date = datecmp(localDateA, localDateB);
+
+        if (date != 0) {
+            resp = date;
+            comparacoes++;
+        }
+        else {
+            resp = dateA.getTitle().compareToIgnoreCase(dateB.getTitle());
+            comparacoes += 2;
+        }
+
+        return resp;
+    }
+
+    // Função quicksort
+    public static void quicksort(Show[] shows, int esq, int dir) {
+        int i = esq,
+            j = dir;
+        Show meio = shows[(esq + dir) / 2];
+
+        while (i <= j) {
+            while (validacao(shows[i], meio) < 0) i++;
+            while (validacao(shows[j], meio) > 0) j--;
+
+            if (i <= j) {
+                Show.swap(shows, i, j); movimentacoes += 3; i++; j--;
+            }
+        }
+        
+        if (esq < j) quicksort(shows, esq, j);
+            
+        if (i < dir) quicksort(shows, i, dir);
+    }
+
+    // Função quicksort base
+    public static void quicksort(Show[] shows, int cont) {
+        quicksort(shows, 0, cont);
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        Show[] shows = new Show[1700];
+        int cont = 0;
+
+        Show.preencher();
+        List<String> lines = Show.getcsv();
+
+        while (!input.equals("FIM")) {
+            int index = Show.converteStr(input);
+
+            if (index >= 0 && index < lines.size()) {
+                Show show = new Show();
+                show.ler(lines.get(index));
+                shows[cont++] = show;
+            }
+            input = sc.nextLine();
+        }
+
+        long start = System.nanoTime();
+        quicksort(shows, cont-1);
+        long end = System.nanoTime();
+        double tempo = (end - start) / 1e6; // em milissegundos
+
+        for (int i = 0; i < 10; i++) {
+            shows[i].imprimir();    
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
+            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
+        }
+        catch(Exception e) {}
+
+        sc.close();
+    }
+
+    public static String log = "874201_quicksortParcial.txt";
+    public static int matricula = 874201;
+    public static int comparacoes = 0;
+    public static int movimentacoes = 0;
+}
+
+class Show {
+    // Atributos da classe Show
     private String show_id;
     private String type;
     private String title;                                
@@ -16,34 +115,33 @@ public class Show {
     private String duration;
     private String listed_in[];
     
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "../tmp/disneyplus.csv";
-    private static List<String> csv = new ArrayList<>();
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
-    public static String log = "874201_quicksortParcial.txt";
-    public static int matricula = 874201;
-    public static int comparacoes = 0;
-    public static int movimentacoes = 0;
-    
+    // Método para obter o caminho do arquivo CSV
     public static List<String> getcsv() {
         return csv;
     }
 
+    // Construtor vazio
     public Show() {}
 
-    public Show(String show_id, String type, String title, String director, String[] cast, String country,
-                Date date_added, int release_year, String rating, String duration, String[] listed_in) {
-        this.show_id = show_id;
-        this.type = type;
-        this.title = title;
-        this.director = director;
-        this.cast = cast;
-        this.country = country;
-        this.date_added = date_added;
-        this.release_year = release_year;
-        this.rating = rating;
-        this.duration = duration;
-        this.listed_in = listed_in;
+    // Construtor com parâmetros completos
+    public Show(String show_id, String type, String title, String director, 
+           String[] cast, String country, Date date_added, int release_year, 
+           String rating, String duration, String[] listed_in) {
+        setShowId(show_id);
+        setType(type);
+        setTitle(title);
+        setDirector(director);
+        setCast(cast);
+        setCountry(country);
+        setDateAdded(date_added);
+        setReleaseYear(release_year);
+        setRating(rating);
+        setDuration(duration);
+        setListedIn(listed_in);
     }
 
     public void setShowId(String show_id) {
@@ -158,6 +256,7 @@ public class Show {
             getDuration() + " ## " + listedInStr + " ##");
     }
     
+    // Método para preencher a lista csv com os dados do arquivo CSV
     public static void preencher() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(arq));
@@ -172,13 +271,15 @@ public class Show {
         }
     }
     
+    // Método para trocar dois elementos no array de shows
     public static void swap(Show[] shows, int i, int j) {
         Show temp = shows[i];
         shows[i] = shows[j];
         shows[j] = temp;
     }
 
-    public static void ordenar(String[] array) {
+    // Método para ordenar o array de shows 
+    public void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
                 if (array[i].compareTo(array[j]) > 0) {               
@@ -190,6 +291,7 @@ public class Show {
         }
     }
     
+    // Método para ler uma linha do CSV e preencher os atributos do show
     public void ler(String line) {
         List<String> array = new ArrayList<>();
         boolean aspas = false;
@@ -210,9 +312,9 @@ public class Show {
                 str.append(c);
             }
         }
-        array.add(str.toString());
+        array.add(str.toString()); // Adiciona o último campo
 
-        String[] coluns = array.toArray(new String[0]);
+        String[] coluns = array.toArray(new String[0]); // Converte para array
 
         setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
@@ -234,7 +336,6 @@ public class Show {
     }
     
     // Converte a string de entrada no índice do CSV
-    // Agora ignora o primeiro caractere ("s")
     public static int converteStr(String input) {
         int valor = 0;
         int multiplicador = 1;
@@ -244,91 +345,5 @@ public class Show {
             multiplicador *= 10;
         }
         return valor;
-    }
-
-    public static int datecmp(LocalDate dateA, LocalDate dateB) {
-        return dateA.compareTo(dateB);
-    }
-
-    public static int validacao(Show dateA, Show dateB) {
-        int resp = 0;
-
-        LocalDate localDateA = dateA.getDateAdded() != null ? dateA.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
-        LocalDate localDateB = dateB.getDateAdded() != null ? dateB.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
-                                                                                                                    
-        int date = datecmp(localDateA, localDateB);
-
-        if (date != 0) {
-            resp = date;
-            comparacoes++;
-        }
-        else {
-            resp = dateA.getTitle().compareToIgnoreCase(dateB.getTitle());
-            comparacoes += 2;
-        }
-
-        return resp;
-    }
-
-    // Função quicksort
-    public static void quicksort(Show[] shows, int esq, int dir) {
-        int i = esq,
-            j = dir;
-        Show meio = shows[(esq + dir) / 2];
-
-        while (i <= j) {
-            while (validacao(shows[i], meio) < 0) i++;
-            while (validacao(shows[j], meio) > 0) j--;
-
-            if (i <= j) {
-                swap(shows, i, j); movimentacoes += 3; i++; j--;
-            }
-        }
-        
-        if (esq < j) quicksort(shows, esq, j);
-            
-        if (i < dir) quicksort(shows, i, dir);
-    }
-
-    // Função quicksort base
-    public static void quicksort(Show[] shows, int cont) {
-        quicksort(shows, 0, cont);
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        Show[] shows = new Show[1700];
-        int cont = 0;
-
-        Show.preencher();
-        List<String> lines = Show.getcsv();
-
-        while (!input.equals("FIM")) {
-            int index = Show.converteStr(input);
-
-            if (index >= 0 && index < lines.size()) {
-                Show show = new Show();
-                show.ler(lines.get(index));
-                shows[cont++] = show;
-            }
-            input = sc.nextLine();
-        }
-
-        long start = System.nanoTime();
-        Show.quicksort(shows, cont-1);
-        long end = System.nanoTime();
-        double tempo = (end - start) / 1e6; // em milissegundos
-
-        for (int i = 0; i < 10; i++) {
-            shows[i].imprimir();    
-        }
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
-        }
-        catch(Exception e) {}
-
-        sc.close();
     }
 }
