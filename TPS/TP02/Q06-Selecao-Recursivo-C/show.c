@@ -29,6 +29,7 @@ typedef struct {
     int listedInCount;
 } Show;
 
+// Function to initialize a Show structure
 void init_show(Show *show) {
     strcpy(show->show_id, "NaN");
     strcpy(show->type, "NaN");
@@ -47,6 +48,7 @@ void init_show(Show *show) {
     show->listedInCount = 1;
 }
 
+// Function to read the CSV file 
 void read_file(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
