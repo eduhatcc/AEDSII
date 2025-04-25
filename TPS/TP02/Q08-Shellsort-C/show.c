@@ -547,6 +547,7 @@ char *strdup_lower(const char *src) {
     return dup;
 }
 
+// Compare two Show structures based on type and title
 int validacao(Show A, Show B) {
     int resp = 0;
 
@@ -568,6 +569,7 @@ int validacao(Show A, Show B) {
     return resp;
 }
 
+// Insertion sort for Shellsort
 void insercaoPorCor(Show *s, int n, int h, int cor) {
     for (int i = h + cor; i < n; i+= h) {
         Show tmp = s[i];
@@ -585,6 +587,7 @@ void insercaoPorCor(Show *s, int n, int h, int cor) {
     }
 }
 
+// Shellsort function
 void shellsort(Show *s, int n) {
     int h = 1;
     while (h < n) {
@@ -599,6 +602,7 @@ void shellsort(Show *s, int n) {
     }
 }
 
+// Main function
 int main() {
     char input[100];
     Show shows[MAX_SHOWS];
@@ -606,12 +610,15 @@ int main() {
     
     read_file("../tmp/disneyplus.csv");
     
+    // Read input from file
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 
         
+        // Read until "FIM" is entered
         while (!is_end(input)) {
             int index = convert_str_to_int(input);
             
+            // Check if index is valid
             if (index >= 0 && index < csv_line_count && csv_lines != NULL && csv_lines[index] != NULL) {
                 init_show(&shows[count]);
                 read_show(&shows[count], csv_lines[index]);
@@ -627,13 +634,14 @@ int main() {
         clock_t end = clock();
         double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
-        
+        // Print file log
         FILE *log = fopen("874201_shellsort.txt", "w");
         if (log) {
             fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, time);
             fclose(log);
         }
 
+        // Print shows
         for (int i = 0; i < count; i++) {
             print_show(&shows[i]);
             free_show(&shows[i]);
