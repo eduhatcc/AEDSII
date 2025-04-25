@@ -13,6 +13,7 @@ int csv_line_count = 0,
     comparacoes = 0,
     movimentacoes = 0;
 
+// Struct to hold show information
 typedef struct {
     char show_id[50];
     char type[20];
@@ -29,6 +30,7 @@ typedef struct {
     int listedInCount;
 } Show;
 
+// Initialize a Show structure with default values
 void init_show(Show *show) {
     strcpy(show->show_id, "NaN");
     strcpy(show->type, "NaN");
@@ -538,7 +540,6 @@ int convert_str_to_int(char *str) {
     return value;
 }
 
-// Convert string to lowercase
 char *strdup_lower(const char *src) {
     char *dup = strdup(src);             
     if (!dup) exit(1);
