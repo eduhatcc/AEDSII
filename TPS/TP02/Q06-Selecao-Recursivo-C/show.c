@@ -546,6 +546,7 @@ char *toUpperCase(const char *str) {
     return result;
 }
 
+// Find the index of the smallest element in the array
 int findSmaller(Show *s, int i, int smaller, int n) {
     int result = smaller;
     if (i < n) {
@@ -566,6 +567,7 @@ int findSmaller(Show *s, int i, int smaller, int n) {
     return result;
 }
 
+// Recursive selection sort
 void selecaoRec(Show *s, int i, int n) {
     int smaller = i;
     if (i < n-1) {
@@ -579,10 +581,12 @@ void selecaoRec(Show *s, int i, int n) {
     }
 }
 
+// Main function to call the recursive selection sort
 void selecao(Show *s, int n) {
     return selecaoRec(s, 0, n);
 }
 
+// Main function
 int main() {
     char input[100];
     Show shows[MAX_SHOWS];
@@ -590,12 +594,15 @@ int main() {
     
     read_file("../tmp/disneyplus.csv");
     
+    // Read input from file
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 
         
+        // Read until "FIM" is entered 
         while (!is_end(input)) {
             int index = convert_str_to_int(input);
             
+            // Check if index is valid
             if (index >= 0 && index < csv_line_count && csv_lines != NULL && csv_lines[index] != NULL) {
                 init_show(&shows[count]);
                 read_show(&shows[count], csv_lines[index]);
@@ -611,13 +618,14 @@ int main() {
         clock_t end = clock();
         double tempo = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
-        
+        // Print file log
         FILE *log = fopen("874201_selecaoRecursivo.txt", "w");
         if (log) {
             fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, tempo);
             fclose(log);
         }
 
+        // Print sorted shows
         for (int i = 0; i < count; i++) {
             print_show(&shows[i]);
             free_show(&shows[i]);
