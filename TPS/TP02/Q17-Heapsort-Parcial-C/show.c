@@ -551,6 +551,8 @@ void toLowerCase(char *str) {
     }
 }
 
+// Compare two shows based on director and title
+// Returns true if a < b, false otherwise
 int diretorMenor(Show a, Show b) {
     bool vazioA = (a.director == NULL || strcmp(a.director, "NaN") == 0);
     bool vazioB = (b.director == NULL || strcmp(b.director, "NaN") == 0);
@@ -591,6 +593,7 @@ int diretorMenor(Show a, Show b) {
     return strcmp(titleA, titleB) < 0;
 }
 
+// Get the index of the largest child
 int getMaiorFilho(Show *heap, int i, int tamHeap) {
     int filhoEsq = 2 * i;
     int filhoDir = 2 * i + 1;
@@ -612,6 +615,7 @@ int getMaiorFilho(Show *heap, int i, int tamHeap) {
     return maiorFilho;
 }
 
+// Rebuild the heap
 void reconstruir(Show *heap, int tamHeap) {
     int i = 1;
     while (i <= tamHeap/2) {
@@ -627,6 +631,7 @@ void reconstruir(Show *heap, int tamHeap) {
     }
 }
 
+// Build the heap
 void construir(Show *heap, int tamHeap) {
     int i = tamHeap;
     while (i > 1 && diretorMenor(heap[i/2], heap[i])) {
@@ -635,6 +640,7 @@ void construir(Show *heap, int tamHeap) {
     }
 }
 
+// Heapsort function
 void heapsort(Show *s, int n) {
     Show heap[301];
     for (int i = 0; i < n; i++) {
@@ -659,6 +665,7 @@ void heapsort(Show *s, int n) {
     }
 }
 
+// Main function
 int main() {
     char input[100];
     Show shows[MAX_SHOWS];
@@ -666,12 +673,15 @@ int main() {
     
     read_file("../tmp/disneyplus.csv");
     
+    // Read input from file
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 
         
+        // Read until "FIM" is entered
         while (!is_end(input)) {
             int index = convert_str_to_int(input);
             
+            // Check if index is valid
             if (index >= 0 && index < csv_line_count && csv_lines != NULL && csv_lines[index] != NULL) {
                 init_show(&shows[count]);
                 read_show(&shows[count], csv_lines[index]);
@@ -687,13 +697,14 @@ int main() {
         clock_t end = clock();
         double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
-        
+        // Print file log
         FILE *log = fopen("874201_heapsortParcial.txt", "w");
         if (log) {
             fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, time);
             fclose(log);
         }
 
+        // Print shows
         for (int i = 0; i < 10; i++) {
             print_show(&shows[i]);
             free_show(&shows[i]);
