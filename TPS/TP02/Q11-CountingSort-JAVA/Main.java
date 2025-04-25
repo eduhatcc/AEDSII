@@ -2,7 +2,121 @@ import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 
-public class Show {
+public class Main {
+    
+    // Método para encontrar o maior ano de lançamento
+    public static int getMaiorAno(Show[] s, int n) {
+        int maior = s[0].getReleaseYear(),
+        i = 0;
+        
+        while (i < n) {
+            if (s[i].getReleaseYear() > maior) {
+                maior = s[i].getReleaseYear();
+            }
+            i++;
+        }
+        
+        return maior;
+    }
+    
+    // Método para realizar o Counting Sort
+    public static void countingsort(Show[] s, int n) {
+        int[] count = new int[getMaiorAno(s, n) +1];
+        Show[] ordenado = new Show[n];
+        int tam = count.length;
+        
+        // inicializa count
+        for (int i = 0; i < tam; i++) {
+            count[i] = 0;
+        }
+        
+        // conta ocorrências por ano
+        for (int i = 0; i < n; i++) {
+            count[s[i].getReleaseYear()]++;
+        }
+        
+        // prefix sum
+        for (int i = 1; i < tam; i++) {
+            count[i] += count[i-1];
+        }
+        
+        // monta o array ordenado (estável)
+        for (int i = n - 1; i >= 0; i--) {
+            int ano = s[i].getReleaseYear();
+            ordenado[ count[ano] -1 ] = s[i];
+            count[ano]--;
+            movimentacoes++;
+        }
+        
+        // para itens de mesmo ano, faz ordenação por título (insertion sort)
+        for (int i = 1; i < n; i++) {
+            Show tmp = ordenado[i];
+            int j = i-1;
+            
+            while (j >= 0 && ordenado[j].getReleaseYear() == tmp.getReleaseYear()
+            && tmp.getTitle().compareToIgnoreCase(ordenado[j].getTitle()) < 0) {
+                comparacoes += 2;       
+                ordenado[j+1] = ordenado[j];
+                movimentacoes++;
+                j--;
+            }
+            if (j+1 != i) {
+                ordenado[j + 1] = tmp;
+                movimentacoes++;
+            }
+        }
+        
+        // Copia para o array original
+        for (int i = 0; i < n; i++) {
+            s[i] = ordenado[i];
+        }
+    }
+    
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        Show[] shows = new Show[1700];
+        int cont = 0;
+        
+        Show.preencher();
+        List<String> lines = Show.getcsv();
+        
+        while (!input.equals("FIM")) {
+            int index = Show.converteStr(input);
+            
+            if (index >= 0 && index < lines.size()) {
+                Show show = new Show();
+                show.ler(lines.get(index));
+                shows[cont++] = show;
+            }
+            input = sc.nextLine();
+        }
+        
+        long start = System.nanoTime();
+        countingsort(shows, cont);
+        long end = System.nanoTime();
+        double tempo = (end - start) / 1e6; // em milissegundos
+        
+        for (int i = 0; i < cont; i++) {
+            shows[i].imprimir();    
+        }
+        
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
+            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
+        }
+        catch(Exception e) {}
+        
+        sc.close();
+    }
+    
+    public static String log = "874201_countingsort.txt";
+    public static int matricula = 874201;
+    public static int comparacoes = 0;
+    public static int movimentacoes = 0;
+}
+   
+class Show {
+    // Atributos da classe Show
     private String show_id;
     private String type;
     private String title;                                
@@ -15,24 +129,23 @@ public class Show {
     private String duration;
     private String listed_in[];
     
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "/tmp/disneyplus.csv";
-    private static List<String> csv = new ArrayList<>();
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
-    public static String log = "874201_countingsort.txt";
-    public static int matricula = 874201;
-    public static int comparacoes = 0;
-    public static int movimentacoes = 0;
     
+    // Método para obter o caminho do arquivo CSV
     public static List<String> getcsv() {
         return csv;
     }
-
+    
+    // Construtor vazio
     public Show() {}
-
+    
+    // Construtor com parâmetros completos
     public Show(String show_id, String type, String title, String director, 
-           String[] cast, String country, Date date_added, int release_year, 
-           String rating, String duration, String[] listed_in) {
+    String[] cast, String country, Date date_added, int release_year, 
+    String rating, String duration, String[] listed_in) {
         setShowId(show_id);
         setType(type);
         setTitle(title);
@@ -45,7 +158,7 @@ public class Show {
         setDuration(duration);
         setListedIn(listed_in);
     }
-
+    
     public void setShowId(String show_id) {
         this.show_id = show_id;
     }
@@ -139,7 +252,7 @@ public class Show {
         
         return clone;
     }
-
+    
     // Método imprimir utilizando os getters e tratando valores nulos ou vazios
     public void imprimir() {
         String dateAdded = (getDateAdded() != null)
@@ -148,16 +261,17 @@ public class Show {
         
         String[] casts = getCast();
         String castStr = Arrays.toString(casts);
-
+        
         String[] listedIn = getListedIn();
         String listedInStr = Arrays.toString(listedIn);
-
+        
         System.out.println("=> " + getShowId() + " ## " + getTitle() + " ## " + getType() + " ## " +
-            getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
-            dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
-            getDuration() + " ## " + listedInStr + " ##");
+        getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
+        dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
+        getDuration() + " ## " + listedInStr + " ##");
     }
     
+    // Método para preencher a lista csv com os dados do arquivo CSV
     public static void preencher() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(arq));
@@ -172,12 +286,14 @@ public class Show {
         }
     }
     
+    // Método para trocar dois elementos no array de shows
     public static void swap(Show[] shows, int i, int j) {
         Show temp = shows[i];
         shows[i] = shows[j];
         shows[j] = temp;
     }
-
+    
+    // Método para ordenar o array de shows 
     public static void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
@@ -190,11 +306,12 @@ public class Show {
         }
     }
     
+    // Método para ler uma linha do CSV e preencher os atributos do show
     public void ler(String line) {
         List<String> array = new ArrayList<>();
         boolean aspas = false;
         StringBuilder str = new StringBuilder();
-
+        
         // alterna o valor de aspas para lidar com campos entre aspas
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
@@ -210,10 +327,10 @@ public class Show {
                 str.append(c);
             }
         }
-        array.add(str.toString());
-
-        String[] coluns = array.toArray(new String[0]);
-
+        array.add(str.toString()); // Adiciona o último campo
+        
+        String[] coluns = array.toArray(new String[0]); // Converte para array
+        
         setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
         setTitle(coluns.length > 2 && !coluns[2].isEmpty() ? coluns[2] : "NaN");
@@ -234,7 +351,6 @@ public class Show {
     }
     
     // Converte a string de entrada no índice do CSV
-    // Agora ignora o primeiro caractere ("s")
     public static int converteStr(String input) {
         int valor = 0;
         int multiplicador = 1;
@@ -244,109 +360,5 @@ public class Show {
             multiplicador *= 10;
         }
         return valor;
-    }
-
-    public static int getMaiorAno(Show[] s, int n) {
-        int maior = s[0].getReleaseYear(),
-            i = 0;
-
-        while (i < n) {
-            if (s[i].getReleaseYear() > maior) {
-                maior = s[i].getReleaseYear();
-            }
-            i++;
-        }
-
-        return maior;
-    }
-
-    public static void countingsort(Show[] s, int n) {
-        int[] count = new int[getMaiorAno(s, n) +1];
-        Show[] ordenado = new Show[n];
-        int tam = count.length;
-    
-        // inicializa count
-        for (int i = 0; i < tam; i++) {
-            count[i] = 0;
-        }
-    
-        // conta ocorrências por ano
-        for (int i = 0; i < n; i++) {
-            count[s[i].getReleaseYear()]++;
-        }
-    
-        // prefix sum
-        for (int i = 1; i < tam; i++) {
-            count[i] += count[i-1];
-        }
-    
-        // monta o array ordenado (estável)
-        for (int i = n - 1; i >= 0; i--) {
-            int ano = s[i].getReleaseYear();
-            ordenado[ count[ano] -1 ] = s[i];
-            count[ano]--;
-            movimentacoes++;
-        }
-    
-        // para itens de mesmo ano, faz ordenação por título (insertion sort)
-        for (int i = 1; i < n; i++) {
-            Show tmp = ordenado[i];
-            int j = i-1;
-
-            while (j >= 0 && ordenado[j].getReleaseYear() == tmp.getReleaseYear()
-                   && tmp.getTitle().compareToIgnoreCase(ordenado[j].getTitle()) < 0) {
-                comparacoes += 2;       
-                ordenado[j+1] = ordenado[j];
-                movimentacoes++;
-                j--;
-            }
-            if (j+1 != i) {
-                ordenado[j + 1] = tmp;
-                movimentacoes++;
-            }
-        }
-    
-        // Copia para o array original
-        for (int i = 0; i < n; i++) {
-            s[i] = ordenado[i];
-        }
-    }
-    
-    
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        Show[] shows = new Show[1700];
-        int cont = 0;
-
-        Show.preencher();
-        List<String> lines = Show.getcsv();
-
-        while (!input.equals("FIM")) {
-            int index = Show.converteStr(input);
-
-            if (index >= 0 && index < lines.size()) {
-                Show show = new Show();
-                show.ler(lines.get(index));
-                shows[cont++] = show;
-            }
-            input = sc.nextLine();
-        }
-
-        long start = System.nanoTime();
-        Show.countingsort(shows, cont);
-        long end = System.nanoTime();
-        double tempo = (end - start) / 1e6; // em milissegundos
-
-        for (int i = 0; i < cont; i++) {
-            shows[i].imprimir();    
-        }
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
-        }
-        catch(Exception e) {}
-
-        sc.close();
     }
 }
