@@ -62,6 +62,7 @@ public class Main {
 }
 
 class Show {
+    // Atributos da classe Show
     private String show_id;
     private String type;
     private String title;                                
