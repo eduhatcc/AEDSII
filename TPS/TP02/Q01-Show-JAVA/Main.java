@@ -2,6 +2,36 @@ import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        Show[] shows = new Show[1700];
+        int cont = 0;
+
+        Show.preencher();
+
+        List<String> lines = Show.getcsv();
+
+        while (!input.equals("FIM")) {
+            int index = Show.converteStr(input);
+
+            if (index >= 0 && index < lines.size()) {
+                Show show = new Show();
+                show.ler(lines.get(index));
+                shows[cont++] = show;
+            }
+            input = sc.nextLine();
+        }
+
+        for (int i = 0; i < cont; i++) {
+            shows[i].imprimir();    
+        }
+
+        sc.close();
+    }
+}
+
 class Show {
     private String show_id;
     private String type;
@@ -16,11 +46,11 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
-    private List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
-    public List<String> getcsv() {
+    public static List<String> getcsv() {
         return csv;
     }
 
@@ -157,7 +187,7 @@ class Show {
     }
     
     // Método para preencher a lista csv com os dados do arquivo CSV
-    public void preencher() {
+    public static void preencher() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(arq));
             String line;
@@ -236,7 +266,7 @@ class Show {
     }
     
     // Converte a string de entrada no índice do CSV
-    public int converteStr(String input) {
+    public static int converteStr(String input) {
         int valor = 0;
         int multiplicador = 1;
         for (int i = input.length() - 1; i >= 1; i--) {
@@ -245,35 +275,5 @@ class Show {
             multiplicador *= 10;
         }
         return valor;
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        Show[] shows = new Show[1700];
-        int cont = 0;
-
-        preencher();
-
-        List<String> lines = getcsv();
-
-        while (!input.equals("FIM")) {
-            int index = converteStr(input);
-
-            if (index >= 0 && index < lines.size()) {
-                Show show = new Show();
-                show.ler(lines.get(index));
-                shows[cont++] = show;
-            }
-            input = sc.nextLine();
-        }
-
-        for (int i = 0; i < cont; i++) {
-            shows[i].imprimir();    
-        }
-
-        sc.close();
     }
 }
