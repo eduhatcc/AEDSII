@@ -2,7 +2,123 @@ import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 
-public class Show {
+public class Main {
+    
+    // Método para encontrar o maior ano de lançamento
+    public static boolean validacao(Show A, Show B) {
+        if (A != null && B != null) {
+            comparacoes++;
+            int cmp = A.getDuration().compareToIgnoreCase(B.getDuration());
+            
+            if (cmp != 0) return cmp < 0;
+            
+            comparacoes++;
+            return A.getTitle().compareToIgnoreCase(B.getTitle()) < 0;       
+        }
+        
+        return false;
+    }
+    
+    public static void intercalar(Show[] s, int esq, int meio, int dir) {
+        int i = 0,
+        j = 0,
+        k = 0,
+        n1 = meio - esq + 1,
+        n2 = dir - meio;
+        
+        Show[] a1 = new Show[n1+1];
+        Show[] a2 = new Show[n2+1];
+        
+        while (i < n1) {
+            a1[i] = s[esq + i];
+            movimentacoes++;
+            i++;
+        }
+        
+        while (j < n2) {
+            a2[j] = s[meio + 1 + j];
+            movimentacoes++;
+            j++;
+        }
+        
+        i = 0; j = 0; k = esq;
+        while (i < n1 && j < n2) {
+            comparacoes++;
+            if (validacao(a1[i], a2[j])) {
+                s[k++] = a1[i++];
+                movimentacoes++;
+            }
+            else {
+                s[k++] = a2[j++];
+                movimentacoes++;
+            }
+        }
+        
+        // Copia o que sobrou
+        while (i < n1) {
+            s[k++] = a1[i++];
+            movimentacoes++;
+        }
+        
+        while (j < n2) {
+            s[k++] = a2[j++];
+            movimentacoes++;
+        }
+    }
+    
+    public static void mergesort(Show[] s, int esq, int dir) {
+        if (esq < dir) {
+            int meio = (esq + dir) / 2;
+            mergesort(s, esq, meio);
+            mergesort(s, meio + 1, dir);
+            intercalar(s, esq, meio, dir);
+        }
+    }
+    
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        Show[] shows = new Show[1700];
+        int cont = 0;
+        
+        Show.preencher();
+        List<String> lines = Show.getcsv();
+        
+        while (!input.equals("FIM")) {
+            int index = Show.converteStr(input);
+            
+            if (index >= 0 && index < lines.size()) {
+                Show show = new Show();
+                show.ler(lines.get(index));
+                shows[cont++] = show;
+            }
+            input = sc.nextLine();
+        }
+        
+        long start = System.nanoTime();
+        mergesort(shows, 0, cont-1);
+        long end = System.nanoTime();
+        double tempo = (end - start) / 1e6; // em milissegundos
+        
+        for (int i = 0; i < cont; i++) {
+            if (shows[i] != null) shows[i].imprimir();    
+        }
+        
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
+            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
+        }
+        catch(Exception e) {}
+        
+        sc.close();
+    }
+    public static String log = "874201_mergesort.txt";
+    public static int matricula = 874201;
+    public static int comparacoes = 0;
+    public static int movimentacoes = 0;
+}
+
+class Show {
+    // Atributos da classe Show
     private String show_id;
     private String type;
     private String title;                                
@@ -15,21 +131,19 @@ public class Show {
     private String duration;
     private String listed_in[];
     
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "../tmp/disneyplus.csv";
-    private static List<String> csv = new ArrayList<>();
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
-    public static String log = "874201_mergesort.txt";
-    public static int matricula = 874201;
-    public static int comparacoes = 0;
-    public static int movimentacoes = 0;
-    
+    // Método para obter o caminho do arquivo CSV
     public static List<String> getcsv() {
         return csv;
     }
 
+    // Construtor vazio
     public Show() {}
 
+    // Construtor com parâmetros completos
     public Show(String show_id, String type, String title, String director, 
            String[] cast, String country, Date date_added, int release_year, 
            String rating, String duration, String[] listed_in) {
@@ -39,6 +153,7 @@ public class Show {
         setDirector(director);
         setCast(cast);
         setCountry(country);
+        setDateAdded(date_added);
         setReleaseYear(release_year);
         setRating(rating);
         setDuration(duration);
@@ -157,6 +272,7 @@ public class Show {
             getDuration() + " ## " + listedInStr + " ##");
     }
     
+    // Método para preencher a lista csv com os dados do arquivo CSV
     public static void preencher() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(arq));
@@ -171,13 +287,15 @@ public class Show {
         }
     }
     
-    public static void swap(Show[] shows, int i, int j) {
+    // Método para trocar dois elementos no array de shows
+    public void swap(Show[] shows, int i, int j) {
         Show temp = shows[i];
         shows[i] = shows[j];
         shows[j] = temp;
     }
-    
-    public static void ordenar(String[] array) {
+
+    // Método para ordenar o array de shows 
+    public void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
                 if (array[i].compareTo(array[j]) > 0) {               
@@ -189,6 +307,7 @@ public class Show {
         }
     }
     
+    // Método para ler uma linha do CSV e preencher os atributos do show
     public void ler(String line) {
         List<String> array = new ArrayList<>();
         boolean aspas = false;
@@ -209,9 +328,9 @@ public class Show {
                 str.append(c);
             }
         }
-        array.add(str.toString());
+        array.add(str.toString()); // Adiciona o último campo
 
-        String[] coluns = array.toArray(new String[0]);
+        String[] coluns = array.toArray(new String[0]); // Converte para array
 
         setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
@@ -233,7 +352,6 @@ public class Show {
     }
     
     // Converte a string de entrada no índice do CSV
-    // Agora ignora o primeiro caractere ("s")
     public static int converteStr(String input) {
         int valor = 0;
         int multiplicador = 1;
@@ -243,112 +361,5 @@ public class Show {
             multiplicador *= 10;
         }
         return valor;
-    }    
-
-    public static boolean validacao(Show A, Show B) {
-        if (A != null && B != null) {
-            comparacoes++;
-            int cmp = A.getDuration().compareToIgnoreCase(B.getDuration());
-    
-            if (cmp != 0) return cmp < 0;
-    
-            comparacoes++;
-            return A.getTitle().compareToIgnoreCase(B.getTitle()) < 0;       
-        }
-
-        return false;
-    }
-
-    public static void intercalar(Show[] s, int esq, int meio, int dir) {
-        int i = 0,
-            j = 0,
-            k = 0,
-            n1 = meio - esq + 1,
-            n2 = dir - meio;
-            
-        Show[] a1 = new Show[n1+1];
-        Show[] a2 = new Show[n2+1];
-       
-        while (i < n1) {
-            a1[i] = s[esq + i];
-            movimentacoes++;
-            i++;
-        }
-
-        while (j < n2) {
-            a2[j] = s[meio + 1 + j];
-            movimentacoes++;
-            j++;
-        }
-
-        i = 0; j = 0; k = esq;
-        while (i < n1 && j < n2) {
-            comparacoes++;
-            if (validacao(a1[i], a2[j])) {
-                s[k++] = a1[i++];
-                movimentacoes++;
-            }
-            else {
-                s[k++] = a2[j++];
-                movimentacoes++;
-            }
-        }
-
-        // Copia o que sobrou
-        while (i < n1) {
-            s[k++] = a1[i++];
-            movimentacoes++;
-        }
-        
-        while (j < n2) {
-            s[k++] = a2[j++];
-            movimentacoes++;
-        }
-    }
-
-    public static void mergesort(Show[] s, int esq, int dir) {
-        if (esq < dir) {
-            int meio = (esq + dir) / 2;
-            mergesort(s, esq, meio);
-            mergesort(s, meio + 1, dir);
-            intercalar(s, esq, meio, dir);
-        }
-    }
-    
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        Show[] shows = new Show[1700];
-        int cont = 0;
-
-        Show.preencher();
-        List<String> lines = Show.getcsv();
-
-        while (!input.equals("FIM")) {
-            int index = Show.converteStr(input);
-
-            if (index >= 0 && index < lines.size()) {
-                Show show = new Show();
-                show.ler(lines.get(index));
-                shows[cont++] = show;
-            }
-            input = sc.nextLine();
-        }
-
-        long start = System.nanoTime();
-        Show.mergesort(shows, 0, cont-1);
-        long end = System.nanoTime();
-        double tempo = (end - start) / 1e6; // em milissegundos
-
-        for (int i = 0; i < cont; i++) {
-            if (shows[i] != null) shows[i].imprimir();    
-        }
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
-        }
-        catch(Exception e) {}
-
-        sc.close();
     }
 }
