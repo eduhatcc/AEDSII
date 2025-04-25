@@ -13,6 +13,7 @@ int csv_line_count = 0,
     comparacoes = 0,
     movimentacoes = 0;
 
+// Struct to hold show information
 typedef struct {
     char show_id[50];
     char type[20];
@@ -29,6 +30,7 @@ typedef struct {
     int listedInCount;
 } Show;
 
+// Initialize a Show structure with default values
 void init_show(Show *show) {
     strcpy(show->show_id, "NaN");
     strcpy(show->type, "NaN");
@@ -554,6 +556,8 @@ void swap(Show *s, int i, int j) {
     movimentacoes += 3;
 }
 
+// Compare two dates
+// Returns -1 if dateA < dateB, 0 if equal, 1 if dateA > dateB
 int datecmp(struct tm *dateA, struct tm *dateB) {
     int resp = 0;
 
@@ -570,6 +574,8 @@ int datecmp(struct tm *dateA, struct tm *dateB) {
     return resp;
 }
 
+// Compare two Show structures based on date and title
+// Returns -1 if dateA < dateB, 0 if equal, 1 if dateA > dateB
 int validacao(Show dateA, Show dateB) {
     int cmp = datecmp(dateA.dateAdded, dateB.dateAdded);
 
@@ -588,6 +594,7 @@ int validacao(Show dateA, Show dateB) {
     return cmp;
 }
 
+// Bubble sort implementation
 void bubblesort(Show *s, int n) {
     for (int i = 0; i < n - 1; i++) {
         for (int j = 0; j < n - i - 1; j++) {
@@ -603,20 +610,25 @@ int main() {
     Show shows[MAX_SHOWS];
     int count = 0;
     
-    read_file("/tmp/disneyplus.csv");
+    // Read CSV file
+    read_file("../tmp/disneyplus.csv");
     
+    // Read file input
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 
         
+        // Read until "FIM"
         while (!is_end(input)) {
             int index = convert_str_to_int(input);
             
+            // Check if index is valid
             if (index >= 0 && index < csv_line_count && csv_lines != NULL && csv_lines[index] != NULL) {
                 init_show(&shows[count]);
                 read_show(&shows[count], csv_lines[index]);
                 count++;
             }
             
+            // Read next input
             if (fgets(input, sizeof(input), stdin) == NULL) break;
             input[strcspn(input, "\n")] = 0; 
         }
@@ -626,13 +638,14 @@ int main() {
         clock_t end = clock();
         double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
-        
+        // Print log
         FILE *log = fopen("874201_bolha.txt", "w");
         if (log) {
             fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, time);
             fclose(log);
         }
 
+        // Print shows
         for (int i = 0; i < count; i++) {
             print_show(&shows[i]);
             free_show(&shows[i]);
