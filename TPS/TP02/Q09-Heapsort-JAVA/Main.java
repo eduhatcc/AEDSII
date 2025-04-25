@@ -2,7 +2,158 @@ import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 
-public class Show {
+public class Main {
+
+    public static boolean diretorMenor(Show a, Show b) {
+        boolean vazioA = (a.getDirector() == null || a.getDirector().isEmpty());
+        boolean vazioB = (b.getDirector() == null || b.getDirector().isEmpty());
+
+        // Se ambos os diretores forem vazios, não há comparação
+        if (vazioA && vazioB) {
+            return false;
+        }
+        // Se o diretor da esquerda for vazio, o da direita é considerado menor
+        if (vazioA) { 
+            comparacoes++; 
+            return false; 
+        }
+        // Se apenas o outro diretor for vazio, o primeiro é considerado menor
+        if (vazioB) { 
+            comparacoes++; 
+            return true; 
+        }
+
+        String dirA = a.getDirector();
+        String dirB = b.getDirector();
+
+        comparacoes++;
+        int comp = dirA.compareToIgnoreCase(dirB);
+        if (comp != 0) return comp < 0;
+
+        // Desempate por título
+        String titleA = a.getTitle();
+        String titleB = b.getTitle();
+
+        comparacoes++;
+        return titleA.compareToIgnoreCase(titleB) < 0; 
+    }
+
+    // Método para obter o maior filho de um nó na heap
+    public static int getMaiorFilho(Show[] heap, int i, int tamHeap) {
+        int filhoEsq = 2 * i;
+        int filhoDir = 2 * i + 1;
+        int maiorFilho = 0;
+
+        comparacoes++;
+        // Verifica se o filho da direita é maior que o tamanho da heap
+        if (filhoDir > tamHeap) { 
+            maiorFilho = filhoEsq;
+        } else {
+            // Verifica qual filho é maior
+            if (diretorMenor(heap[filhoEsq], heap[filhoDir])) {
+                maiorFilho = filhoDir;
+            } else {
+                maiorFilho = filhoEsq;
+            }
+        }
+
+        return maiorFilho;
+    }
+
+    // Método para reconstruir a heap após a remoção do maior elemento
+    public static void reconstruir(Show[] heap, int tamHeap) {
+        int i = 1;
+        while (i <= tamHeap / 2) {
+            int filho = getMaiorFilho(heap, i, tamHeap);
+
+            // Verifica se o nó atual é menor que o maior filho
+            if (!diretorMenor(heap[filho], heap[i])) {
+                Show.swap(heap, i, filho); movimentacoes += 3;
+                i = filho;
+            } else {
+                i = tamHeap;
+            }
+        }
+    }
+
+    // Método para construir a heap a partir de um nó
+    public static void construir(Show[] heap, int tamHeap) {
+        int i = tamHeap;
+        while (i > 1 && diretorMenor(heap[i / 2], heap[i])) {
+            Show.swap(heap, i, i / 2); movimentacoes += 3;
+            i /= 2;
+        }
+    }
+
+    // Método para realizar o heapsort
+    public static void heapsort(Show[] shows, int n) {
+        Show[] heap = new Show[n + 1];
+        for (int i = 0; i < n; i++) {
+            heap[i + 1] = shows[i];
+            movimentacoes++;
+        }
+
+        int tamHeap = 2;
+        while (tamHeap <= n) {
+            construir(heap, tamHeap++);
+        }
+
+        tamHeap = n;
+        while (tamHeap > 1) {
+            Show.swap(heap, 1, tamHeap--); movimentacoes += 3;
+            reconstruir(heap, tamHeap);
+        }
+
+        for (int i = 0; i < n; i++) {
+            shows[i] = heap[i + 1];
+            movimentacoes++;
+        }
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        Show[] shows = new Show[1700];
+        int cont = 0;
+
+        Show.preencher();
+        List<String> lines = Show.getcsv();
+
+        while (!input.equals("FIM")) {
+            int index = Show.converteStr(input);
+
+            if (index >= 0 && index < lines.size()) {
+                Show show = new Show();
+                show.ler(lines.get(index));
+                shows[cont++] = show;
+            }
+            input = sc.nextLine();
+        }
+
+        long start = System.nanoTime();
+        heapsort(shows, cont);
+        long end = System.nanoTime();
+        double tempo = (end - start) / 1e6; // em milissegundos
+
+        for (int i = 0; i < cont; i++) {
+            shows[i].imprimir();    
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
+            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
+        }
+        catch(Exception e) {}
+
+        sc.close();
+    }
+
+    public static String log = "874201_heapsort.txt";
+    public static int matricula = 874201;
+    public static int comparacoes = 0;
+    public static int movimentacoes = 0;
+}
+
+class Show {
+    // Atributos da classe Show
     private String show_id;
     private String type;
     private String title;                                
@@ -15,36 +166,36 @@ public class Show {
     private String duration;
     private String listed_in[];
     
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); 
-    private static String arq = "../tmp/disneyplus.csv";
-    private static List<String> csv = new ArrayList<>();
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
-    public static String log = "874201_heapsort.txt";
-    public static int matricula = 874201;
-    public static int comparacoes = 0;
-    public static int movimentacoes = 0;
     
+    // Método para obter o caminho do arquivo CSV
     public static List<String> getcsv() {
         return csv;
     }
-
+    
+    // Construtor vazio
     public Show() {}
-
-    public Show(String show_id, String type, String title, String director, String[] cast, String country,
-                Date date_added, int release_year, String rating, String duration, String[] listed_in) {
-        this.show_id = show_id;
-        this.type = type;
-        this.title = title;
-        this.director = director;
-        this.cast = cast;
-        this.country = country;
-        this.date_added = date_added;
-        this.release_year = release_year;
-        this.rating = rating;
-        this.duration = duration;
-        this.listed_in = listed_in;
+    
+    // Construtor com parâmetros completos
+    public Show(String show_id, String type, String title, String director, 
+    String[] cast, String country, Date date_added, int release_year, 
+    String rating, String duration, String[] listed_in) {
+        setShowId(show_id);
+        setType(type);
+        setTitle(title);
+        setDirector(director);
+        setCast(cast);
+        setCountry(country);
+        setDateAdded(date_added);
+        setReleaseYear(release_year);
+        setRating(rating);
+        setDuration(duration);
+        setListedIn(listed_in);
     }
-
+    
     public void setShowId(String show_id) {
         this.show_id = show_id;
     }
@@ -138,7 +289,7 @@ public class Show {
         
         return clone;
     }
-
+    
     // Método imprimir utilizando os getters e tratando valores nulos ou vazios
     public void imprimir() {
         String dateAdded = (getDateAdded() != null)
@@ -147,16 +298,17 @@ public class Show {
         
         String[] casts = getCast();
         String castStr = Arrays.toString(casts);
-
+        
         String[] listedIn = getListedIn();
         String listedInStr = Arrays.toString(listedIn);
-
+        
         System.out.println("=> " + getShowId() + " ## " + getTitle() + " ## " + getType() + " ## " +
-            getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
-            dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
-            getDuration() + " ## " + listedInStr + " ##");
+        getDirector() + " ## " + castStr + " ## " + getCountry() + " ## " +
+        dateAdded + " ## " + getReleaseYear() + " ## " + getRating() + " ## " +
+        getDuration() + " ## " + listedInStr + " ##");
     }
     
+    // Método para preencher a lista csv com os dados do arquivo CSV
     public static void preencher() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(arq));
@@ -171,12 +323,14 @@ public class Show {
         }
     }
     
+    // Método para trocar dois elementos no array de shows
     public static void swap(Show[] shows, int i, int j) {
         Show temp = shows[i];
         shows[i] = shows[j];
         shows[j] = temp;
     }
-
+    
+    // Método para ordenar o array de shows 
     public static void ordenar(String[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = i + 1; j < array.length; j++) {
@@ -189,11 +343,12 @@ public class Show {
         }
     }
     
+    // Método para ler uma linha do CSV e preencher os atributos do show
     public void ler(String line) {
         List<String> array = new ArrayList<>();
         boolean aspas = false;
         StringBuilder str = new StringBuilder();
-
+        
         // alterna o valor de aspas para lidar com campos entre aspas
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
@@ -209,10 +364,10 @@ public class Show {
                 str.append(c);
             }
         }
-        array.add(str.toString());
-
-        String[] coluns = array.toArray(new String[0]);
-
+        array.add(str.toString()); // Adiciona o último campo
+        
+        String[] coluns = array.toArray(new String[0]); // Converte para array
+        
         setShowId(coluns.length > 0 && !coluns[0].isEmpty() ? coluns[0] : "NaN");
         setType(coluns.length > 1 && coluns[1].trim().equalsIgnoreCase("movie") ? "Movie" : "TV Show");
         setTitle(coluns.length > 2 && !coluns[2].isEmpty() ? coluns[2] : "NaN");
@@ -233,7 +388,6 @@ public class Show {
     }
     
     // Converte a string de entrada no índice do CSV
-    // Agora ignora o primeiro caractere ("s")
     public static int converteStr(String input) {
         int valor = 0;
         int multiplicador = 1;
@@ -243,138 +397,5 @@ public class Show {
             multiplicador *= 10;
         }
         return valor;
-    }
-    
-    public static boolean diretorMenor(Show a, Show b) {
-        boolean vazioA = (a.getDirector() == null || a.getDirector().isEmpty());
-        boolean vazioB = (b.getDirector() == null || b.getDirector().isEmpty());
-
-        if (vazioA && vazioB) {
-            return false;
-        }
-        if (vazioA) { 
-            comparacoes++; 
-            return false; 
-        }
-        if (vazioB) { 
-            comparacoes++; 
-            return true; 
-        }
-    
-        String dirA = a.getDirector();
-        String dirB = b.getDirector();
-    
-        comparacoes++;
-        int comp = dirA.compareToIgnoreCase(dirB);
-        if (comp != 0) return comp < 0;
-    
-        // Desempate por título
-        String titleA = a.getTitle();
-        String titleB = b.getTitle();
-    
-        comparacoes++;
-        return titleA.compareToIgnoreCase(titleB) < 0;
-    }
-    
-    public static int getMaiorFilho(Show[] heap, int i, int tamHeap) {
-        int filhoEsq = 2 * i;
-        int filhoDir = 2 * i + 1;
-        int maiorFilho = 0;
-    
-        comparacoes++;
-        if (filhoDir > tamHeap) {
-            maiorFilho = filhoEsq;
-        } else {
-            if (diretorMenor(heap[filhoEsq], heap[filhoDir])) {
-                maiorFilho = filhoDir;
-            } else {
-                maiorFilho = filhoEsq;
-            }
-        }
-    
-        return maiorFilho;
-    }
-    
-    public static void reconstruir(Show[] heap, int tamHeap) {
-        int i = 1;
-        while (i <= tamHeap / 2) {
-            int filho = getMaiorFilho(heap, i, tamHeap);
-    
-            if (!diretorMenor(heap[filho], heap[i])) {
-                swap(heap, i, filho); movimentacoes += 3;
-                i = filho;
-            } else {
-                i = tamHeap;
-            }
-        }
-    }
-    
-    public static void construir(Show[] heap, int tamHeap) {
-        int i = tamHeap;
-        while (i > 1 && diretorMenor(heap[i / 2], heap[i])) {
-            swap(heap, i, i / 2); movimentacoes += 3;
-            i /= 2;
-        }
-    }
-    
-    public static void heapsort(Show[] shows, int n) {
-        Show[] heap = new Show[n + 1];
-        for (int i = 0; i < n; i++) {
-            heap[i + 1] = shows[i];
-            movimentacoes++;
-        }
-    
-        int tamHeap = 2;
-        while (tamHeap <= n) {
-            construir(heap, tamHeap++);
-        }
-    
-        tamHeap = n;
-        while (tamHeap > 1) {
-            swap(heap, 1, tamHeap--); movimentacoes += 3;
-            reconstruir(heap, tamHeap);
-        }
-    
-        for (int i = 0; i < n; i++) {
-            shows[i] = heap[i + 1];
-            movimentacoes++;
-        }
-    }
-    
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        Show[] shows = new Show[1700];
-        int cont = 0;
-
-        Show.preencher();
-        List<String> lines = Show.getcsv();
-
-        while (!input.equals("FIM")) {
-            int index = Show.converteStr(input);
-
-            if (index >= 0 && index < lines.size()) {
-                Show show = new Show();
-                show.ler(lines.get(index));
-                shows[cont++] = show;
-            }
-            input = sc.nextLine();
-        }
-
-        long start = System.nanoTime();
-        Show.heapsort(shows, cont);
-        long end = System.nanoTime();
-        double tempo = (end - start) / 1e6; // em milissegundos
-
-        for (int i = 0; i < cont; i++) {
-            shows[i].imprimir();    
-        }
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
-        }
-        catch(Exception e) {}
-
-        sc.close();
     }
 }
