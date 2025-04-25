@@ -554,6 +554,8 @@ void swap(Show *s, int i, int j) {
     movimentacoes += 3;
 }
 
+// Compare two dates
+// Returns -1 if dateA < dateB, 0 if equal, 1 if dateA > dateB
 int datecmp(struct tm *dateA, struct tm *dateB) {
     int resp = 0;
 
@@ -570,6 +572,7 @@ int datecmp(struct tm *dateA, struct tm *dateB) {
     return resp;
 }
 
+// Compare two Show structures based on date and title
 int validacao(Show dateA, Show dateB) {
     int cmp = datecmp(dateA.dateAdded, dateB.dateAdded);
 
@@ -588,8 +591,7 @@ int validacao(Show dateA, Show dateB) {
     return cmp;
 }
 
-
-
+// Quicksort function
 void quicksort(Show *s, int esq, int dir) {
     int i = esq,
         j = dir;
@@ -610,10 +612,12 @@ void quicksort(Show *s, int esq, int dir) {
     if (i < dir) quicksort(s, i, dir);
 }
 
+// Quicksort base function
 void quicksortBase(Show *s, int n) {
     quicksort(s, 0, n);
 }
 
+// Main function
 int main() {
     char input[100];
     Show shows[MAX_SHOWS];
@@ -621,12 +625,15 @@ int main() {
     
     read_file("../tmp/disneyplus.csv");
     
+    // Read input from user
     if (fgets(input, sizeof(input), stdin) != NULL) {
         input[strcspn(input, "\n")] = 0; 
         
+        // Read until "FIM" is entered
         while (!is_end(input)) {
             int index = convert_str_to_int(input);
             
+            // Check if index is valid
             if (index >= 0 && index < csv_line_count && csv_lines != NULL && csv_lines[index] != NULL) {
                 init_show(&shows[count]);
                 read_show(&shows[count], csv_lines[index]);
@@ -642,13 +649,14 @@ int main() {
         clock_t end = clock();
         double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         
-        
+        // Print file log
         FILE *log = fopen("874201_quicksort.txt", "w");
         if (log) {
             fprintf(log, "874201\t%d\t%d\t%.2f\n", comparacoes, movimentacoes, time);
             fclose(log);
         }
 
+        // Print shows
         for (int i = 0; i < count; i++) {
             print_show(&shows[i]);
             free_show(&shows[i]);
