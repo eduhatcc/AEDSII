@@ -1,4 +1,4 @@
-public class Celula {
+class Celula {
 	private int elemento;
 	private Celula prox;
 
@@ -20,5 +20,8 @@ public class Celula {
 
 	public void setProx(Celula prox) {
 		this.prox = prox;
+	}
+	public Celula getProx() {
+		return this.prox;
 	}
 }

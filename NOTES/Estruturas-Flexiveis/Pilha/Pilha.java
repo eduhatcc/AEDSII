@@ -1,4 +1,4 @@
-public class Pilha {
+class Pilha {
     private Celula topo;
     public Pilha() {
         setTopo(null);
@@ -13,8 +13,9 @@ public class Pilha {
 
     public void inserir(int elemento) {
         Celula inserir = new Celula(elemento);
-	inserir.prox = getTopo();
-	inserir = null;
+		inserir.setProx(getTopo());
+		setTopo(inserir);
+		inserir = null;
     }
 
     public int remover() throws Exception {
@@ -23,7 +24,7 @@ public class Pilha {
 
 	int elemento = topo.getElemento();
 	Celula tmp = getTopo();
-	topo = topo.prox;
+	topo = topo.getProx();
 	tmp.setProx(null);
 	tmp = null;
 
@@ -31,21 +32,43 @@ public class Pilha {
     }
 
     public void mostrar() {
-	    Celula i = getTopo();
+	Celula i = getTopo();
 
-	    System.out.print("[");
-	    while (i != null) {
-		    System.out.print(i.getElemento() + " ");
-		    i = i.getProx();
-	    }
-	    System.out.println("]");
+	System.out.print("[ ");
+	while (i != null) {
+	    System.out.print(i.getElemento() + " ");
+	    i = i.getProx();
+	}
+	System.out.println("]");
+    }
+
+    public int somar() {
+	Celula i = getTopo();
+	int soma = 0;
+
+	while (i != null) {
+		soma += i.getElemento();
+		i = i.getProx();
+	}    
+
+	return soma;
+    }
+
+
+    public int somarRecursivo(Celula i) {
+	int soma = 0;
+
+	if (i != null) {
+		soma = i.getElemento() + somarRecursivo(i.getProx());
+	}
+
+	return soma;
     }
 
     /*
-     * IMPLEMENTAR O MÉTODO SOMAR
-     * Slide u04 Estruturas de dados básicas flexíveis
+     * FUNÇÃO BASE
      */
-    public int somar() {
-	    
+    public int somarRecursivo() {
+	return somarRecursivo(getTopo());
     }
 }
