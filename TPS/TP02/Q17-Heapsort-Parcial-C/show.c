@@ -654,13 +654,13 @@ void heapsort(Show *s, int n) {
     }
 
     tamHeap = n;
-    while (tamHeap > 1) {
+    for (int i = 0; i < k; i++) {
         swap(heap, 1, tamHeap--);
         reconstruir(heap, tamHeap);
     }
-
-    for (int i = 0; i < 10; i++) {
-        s[i] = heap[i+1];
+    
+    for (int i = 0; i < n; i++) {
+        s[i] = heap[i + 1];
         movimentacoes++;
     }
 }
