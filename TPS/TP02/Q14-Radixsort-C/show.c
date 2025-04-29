@@ -642,7 +642,7 @@ int main() {
     int count = 0;
     
     // Read CSV file
-    read_file("/tmp/disneyplus.csv");
+    read_file("../tmp/disneyplus.csv");
     
     // Read file input
     if (fgets(input, sizeof(input), stdin) != NULL) {
