@@ -7,7 +7,7 @@ public class Main {
     // Método para encontrar o maior ano de lançamento
     public static int getMaiorAno(Show[] s, int n) {
         int maior = s[0].getReleaseYear(),
-        i = 0;
+        i = 1;
         
         while (i < n) {
             if (s[i].getReleaseYear() > maior) {
@@ -28,6 +28,7 @@ public class Main {
         // inicializa count
         for (int i = 0; i < tam; i++) {
             count[i] = 0;
+	    movimentacoes++;
         }
         
         // conta ocorrências por ano
@@ -38,6 +39,7 @@ public class Main {
         // prefix sum
         for (int i = 1; i < tam; i++) {
             count[i] += count[i-1];
+	    movimentacoes++;
         }
         
         // monta o array ordenado (estável)
@@ -69,6 +71,7 @@ public class Main {
         // Copia para o array original
         for (int i = 0; i < n; i++) {
             s[i] = ordenado[i];
+	    movimentacoes++;
         }
     }
     
