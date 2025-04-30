@@ -643,6 +643,8 @@ void construir(Show *heap, int tamHeap) {
 // Heapsort function
 void heapsort(Show *s, int n) {
     Show heap[301];
+    int k = 10;
+
     for (int i = 0; i < n; i++) {
         heap[i+1] = s[i];
         movimentacoes++;
@@ -653,13 +655,21 @@ void heapsort(Show *s, int n) {
         construir(heap, tamHeap++);
     }
 
+    /*
+    int tamHeap = 1;
+    while (tamHeap < n) {
+	    tamHeap++;
+	    construir(heap, tamHeap);
+    }
+    */
+
     tamHeap = n;
-    for (int i = 0; i < k; i++) {
+    while (tamHeap > (n - k)) {
         swap(heap, 1, tamHeap--);
         reconstruir(heap, tamHeap);
     }
     
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < k; i++) {
         s[i] = heap[i + 1];
         movimentacoes++;
     }
@@ -668,6 +678,7 @@ void heapsort(Show *s, int n) {
 // Main function
 int main() {
     char input[100];
+
     Show shows[MAX_SHOWS];
     int count = 0;
     
