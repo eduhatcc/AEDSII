@@ -139,4 +139,51 @@ class Pilha {
      * MÉTODO RECURSIVO PARA MOSTRAR OS ELEMENTOS DA PILHA NA ORDEM QUE FORAM INSERIDOS
      * MÉTODO ITERATIVO PARA MOSTRAR OS ELEMENTOS DA PILHA NA ORDEM QUE FORAM INSERIDOS
      */
+
+    /*
+     * MÉTODO RECURSIVO MOSTRAR ELEMENTOS NA ORDEM QUE SERÃO REMOVIDOS
+     */
+    public void mostrarRecursivoRemovidos(Celula i) {
+	    if (i.getElemento() != null) {
+		    System.out.print(i.getElemento() + " ");
+		    mostrarOrdemRemovidos(i.getProx());
+	    }
+    }
+
+    /*
+     * MÉTODO BASE MOSTRAR ELEMENTOS NA ORDEM QUE SERÃO REMOVIDOS
+     */
+    public void mostrarRecursivoRemovidos() {
+	    System.out.print("[ ");
+	    mostrarOrdemRemovidos(Celula i);
+	    System.out.println("]");
+    }
+
+    /*
+     * MÉTODO RECURSIVO MOSTRAR ELEMENTOS NA ORDEM QUE FORAM INSERIDOS
+     */
+    public void mostrarRecursivoInseridos(Celula i) {
+	    if (i.getElemento() != null) {
+		    mostrarOrdemInseridos(i.getProx());
+		    System.out.print(i.getElemento() + " ");
+	    }
+    }
+
+    /*
+     * MÉTODO BASE MOSTRAR ELEMENTOS NA ORDEM QUE FORAM INSERIDOS
+     */
+    public void mostrarRecursivoInseridos() {
+	    System.out.print("[ ");
+    	    mostrarOrdemRemovidos(Celula i);
+	    System.out.println("]");
+    }
+
+    /*
+     * MÉTODO ITERATIVO MOSTRAR ELEMENTOS NA ORDEM QUE FORAM INSERIDOS
+     */
+    public void mostrarInterativoInseridos() {
+	    for (Celula i = i.getTopo(); i != null; i = i.getProx()) {
+		    // Implementar solução
+	    }
+    }
 }
