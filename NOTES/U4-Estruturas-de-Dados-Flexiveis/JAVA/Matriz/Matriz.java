@@ -4,25 +4,54 @@
  */
 
 class CelulaMatriz {
-	private CelulaMatriz up;
-	private CelulaMatriz down;
-	private CelulaMatriz left
-	private CelulaMatriz right;
+	int elemento;
+	private CelulaMatriz sup;
+	private CelulaMatriz inf;
+	private CelulaMatriz esq;
+	private CelulaMatriz dir;
 
 	public CelulaMatriz() {
-		setCelulaMatriz(0)
+		setLinha(null);
+		setColuna(null);
+	}
+
+	/*
+	 * IMPLEMENTADO EM SALA PELO CAPANEMA
+	 */
+	public CelulaMatriz(int linha, int coluna) {
+		setLinha(linha);
+		setColuna(coluna);
+
+		inicio = new CelulaMat();
+		CelulaMatriz celCol = inicio;
+		for (int x = 1; x < col; x++) {
+			celCol.getDir() = new CelulaMat();
+			celCol.getDir().getEsq() = celCol;
+			celCol = celCol.getDir();
+		}
+
+		CelulaMatriz celLinha = inicio;
+		for (int l = 1; l < linha; l++) {
+			CelLinha.getInf() = new CelulaMatriz();
+			celLinha.getInf().getSup() = celLinha();
+			celLinha = celLinha.getInf();
+			celCol = celLinha;
+
+			for (int x = 1; x < col; x++) {
+				celCol.getDir() = new CelulaMatriz();
+				celCol.getDir().getEsq() = celCol.getSup().getDir();
+				celCol.getSup().getDir().getInf() = celCol.getDir();
+				celCol = celCol.getDir();
+			}
+		}
 	}
 }
 
 public class Matriz {
 	// Atributos privados
-	private Celula inicio;
+	private CelulaMatriz inicio;
 	private int linha;
 	private int coluna;
-	private Celula up;
-	private Celula down;
-	private Celula left;
-	private Celula right;
 
 	// Construtor vazio
 	public Matriz() {
