@@ -22,10 +22,10 @@ class CelulaMatriz {
 		setLinha(linha);
 		setColuna(coluna);
 
-		inicio = new CelulaMat();
+		inicio = new CelulaMatriz();
 		CelulaMatriz celCol = inicio;
 		for (int x = 1; x < col; x++) {
-			celCol.getDir() = new CelulaMat();
+			celCol.getDir() = new CelulaMatriz();
 			celCol.getDir().getEsq() = celCol;
 			celCol = celCol.getDir();
 		}
@@ -42,6 +42,37 @@ class CelulaMatriz {
 				celCol.getDir().getEsq() = celCol.getSup().getDir();
 				celCol.getSup().getDir().getInf() = celCol.getDir();
 				celCol = celCol.getDir();
+			}
+		}
+	}
+
+	/*
+	 * METÓDO SEM USAR SET E GET
+	 */
+	public class CelulaMatriz2(int linha, int coluna) {
+		setLinha(linha);
+		setColuna(coluna);
+
+		inicio = new CelulaMatriz();
+		CelulaMatriz celCol = inicio;
+		for (int x = 1; x < col; x++) {
+			celCol.dir = new CelulaMatriz();
+			celCol = celCol.dir;
+			celCol = celCol.dir;
+		}
+
+		CelulaMatriz celLinha = inicio;
+		for (int l = 1; l < linha; l++) {
+			celLinha.inf = new CelulaMatriz();
+			celLinha.inf.sup = celLinha();
+			celLinha = celLinha.inf;
+			celCol = celLinha;
+
+			for (int x = 1; x < col; x++) {
+				celCol.dir = new CelulaMatriz();
+				celCol.dir.esq = celCol.sup.dir;
+				celCol.sup.dir.inf = celCol.dir;
+				celCol = celCol.dir;
 			}
 		}
 	}
