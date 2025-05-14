@@ -8,7 +8,7 @@ class Pessoa {
 	private String[] cores;
 	private String palavra;
 
-	public Pessoa () {}
+	public Pessoa() {}
 
 	public Pessoa(int id, String nome, int idade, String[] cores, String palavra) {
 		this.id = id;
@@ -43,11 +43,11 @@ class Pessoa {
 	}
 }
 
-public class Main {
+public class Main3 {
 	public static void swap(Pessoa[] p, int i, int j) {
 		Pessoa tmp = p[i];
 		p[i] = p[j];
-		p[j] = tmp; 
+		p[j] = tmp;
 	}
 
 	public static void selectionSort(Pessoa[] p, int index) {
@@ -70,20 +70,20 @@ public class Main {
 		while (!line.equals("FIM")) {
 			String[] campos = new String[5];
 			int cont = 0;
-			boolean aspas = false;
+
 			StringBuilder str = new StringBuilder();
+			boolean aspas = false;
 
 			for (int i = 0; i < line.length(); i++) {
 				char c = line.charAt(i);
 
 				if (c == '"') aspas = !aspas;
-				else if (c == ',' && !aspas) {
+				else if(c == ',' && !aspas) {
 					campos[cont++] = str.toString();
 					str.setLength(0);
 				}
 				else str.append(c);
 			}
-
 			campos[cont] = str.toString();
 
 			int id = Integer.parseInt(campos[0]);
@@ -100,7 +100,9 @@ public class Main {
 		selectionSort(p, index);
 
 		for (int i = 0; i < index; i++) {
-			p[i].imprimir();		
+			p[i].imprimir();
 		}
+
+		sc.close();
 	}
 }

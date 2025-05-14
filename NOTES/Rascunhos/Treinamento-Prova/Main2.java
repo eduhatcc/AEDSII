@@ -8,7 +8,7 @@ class Pessoa {
 	private String[] cores;
 	private String palavra;
 
-	public Pessoa () {}
+	public Pessoa() {}
 
 	public Pessoa(int id, String nome, int idade, String[] cores, String palavra) {
 		this.id = id;
@@ -18,55 +18,19 @@ class Pessoa {
 		this.palavra = palavra;
 	}
 
-	public int getId() {
-		return this.id;
-	}
-
-	public String getNome() {
-		return this.nome;
-	}
-
-	public int getIdade() {
-		return this.idade;
-	}
-
-	public String[] getCores() {
-		return this.cores;
-	}
-
-	public String getPalavra() {
-		return this.palavra;
-	}
-
 	public void imprimir() {
 		System.out.printf("%d %s %d %s %s%n", id, nome, idade, Arrays.toString(cores), palavra);
 	}
 }
 
-public class Main {
-	public static void swap(Pessoa[] p, int i, int j) {
-		Pessoa tmp = p[i];
-		p[i] = p[j];
-		p[j] = tmp; 
-	}
-
-	public static void selectionSort(Pessoa[] p, int index) {
-		int menor = 0;
-		for (int i = 0; i < index; i++) {
-			menor = i;
-			for (int j = i+1; j < index; j++) {
-				if (p[j].getId() < p[menor].getId()) menor = j;
-			}
-			swap(p, i, menor);
-		}
-	}
-
+public class Main2 {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		Pessoa[] p = new Pessoa[50];
 		int index = 0;
 
 		String line = sc.nextLine();
+
 		while (!line.equals("FIM")) {
 			String[] campos = new String[5];
 			int cont = 0;
@@ -97,10 +61,10 @@ public class Main {
 			line = sc.nextLine();
 		}
 
-		selectionSort(p, index);
-
 		for (int i = 0; i < index; i++) {
-			p[i].imprimir();		
+			p[i].imprimir();
 		}
+
+		sc.close();
 	}
 }
