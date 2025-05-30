@@ -5,59 +5,7 @@ import java.time.*;
 
 public class Main {
 
-    // Função para comparar duas datas
-    // Retorna 0 se forem iguais, -1 se dateA < dateB e 1 se dateA > dateB
-    public static int datecmp(LocalDate dateA, LocalDate dateB) {
-        return dateA.compareTo(dateB);
-    }
-
-    // Função de comparação para o quicksort
-    // Retorna -1 se dateA < dateB, 0 se forem iguais e 1 se dateA > dateB
-    public static int validacao(Show dateA, Show dateB) {
-        int resp = 0;
-
-        LocalDate localDateA = dateA.getDateAdded() != null ? dateA.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
-        LocalDate localDateB = dateB.getDateAdded() != null ? dateB.getDateAdded().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.MIN;
-                                                                                                                    
-        int date = datecmp(localDateA, localDateB);
-
-        if (date != 0) {
-            resp = date;
-            comparacoes++;
-        }
-        else {
-            resp = dateA.getTitle().compareToIgnoreCase(dateB.getTitle());
-            comparacoes += 2;
-        }
-
-        return resp;
-    }
-
-    // Função quicksort
-    public static void quicksort(Show[] shows, int esq, int dir) {
-        int i = esq,
-            j = dir;
-        Show meio = shows[(esq + dir) / 2];
-
-        while (i <= j) {
-            while (validacao(shows[i], meio) < 0) i++;
-            while (validacao(shows[j], meio) > 0) j--;
-
-            if (i <= j) {
-                Show.swap(shows, i, j); movimentacoes += 3; i++; j--;
-            }
-        }
-        
-        if (esq < j) quicksort(shows, esq, j);
-            
-        if (i < dir) quicksort(shows, i, dir);
-    }
-
-    // Função quicksort base
-    public static void quicksort(Show[] shows, int cont) {
-        quicksort(shows, 0, cont);
-    }
-
+    // Função Main
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();
@@ -78,19 +26,62 @@ public class Main {
             input = sc.nextLine();
         }
 
-        long start = System.nanoTime();
-        quicksort(shows, cont-1);
-        long end = System.nanoTime();
-        double tempo = (end - start) / 1e6; // em milissegundos
-
-        for (int i = 0; i < 10; i++) {
-            shows[i].imprimir();    
+        Lista lista = new Lista();
+        
+        String getId = sc.nextLine();
+        while (!getId.equals("FIM")) {
+            int id = Show.converteStr(getId);
+            try {
+                lista.inserirFim(shows[i]);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            getId = sc.nextLine();
         }
 
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, comparacoes, movimentacoes, tempo));
+        int n = sc.nextInt();
+        int id;
+
+        for (int i = 0; i < n; i++) {
+            String comando = sc.next();
+            if (comando.equals("II")) {
+                getId = sc.next();
+                id = Show.converteStr(getId);
+                try {
+                    lista.inserirInicio(shows[id-1].clone());
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+            if (comando.equals("I*")) {
+                getId = sc.next();
+                int index = Show.converteStr(id);
+                try {
+                    lista.inserir(shows[index], pos);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            } else if (comando.equals("R")) {
+                int pos = sc.nextInt();
+                try {
+                    lista.remover(pos);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            } else if (comando.equals("RI")) {
+                try {
+                    lista.removerInicio(shows[i]);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            } else if (comando.equals("RF")) {
+                try {
+                    lista.removerFim(shows[i]);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
         }
-        catch(Exception e) {}
 
         sc.close();
     }
@@ -350,14 +341,12 @@ class Show {
 
 class Lista {
     private Show[] array;
-    private int TAM;
+    private int n;
 
     public Lista() {
         array = new Show[1368];
         n = 0;
     }
-
-    public Lista() {}
 
     public void inserirInicio(Show show) throws Exception {
         if (n >= array.length) {
@@ -432,5 +421,17 @@ class Lista {
     /*
      * FALTA IMPLEMENTAR O MÉTODO MOSTRAR E PESQUISAR
      */
-    public void mostrar()
+    public void mostrar() {
+        System.out.println("[");
+        for (int i = 0; i < n; i++) {
+            System.out.print(array[i].getShowId() + " ");
+        }
+        System.out.println("]");
+    }
+
+    public void mostraRestantes() {
+        for (int i = 0; i < n; i++) {
+            array[i].imprimir();
+        }
+    }
 }
