@@ -26,70 +26,167 @@ public class Main {
             input = sc.nextLine();
         }
 
-        Lista lista = new Lista();
-        
-        String getId = sc.nextLine();
-        while (!getId.equals("FIM")) {
-            int id = Show.converteStr(getId);
-            try {
-                lista.inserirFim(shows[i]);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            getId = sc.nextLine();
+        Lista lista = new Lista(1000);
+        input = sc.nextLine();
+        while (!input.equals("FIM")) {
+            int index = Integer.parseInt(linha.substring(1)) - 1;
+            lista.inserirFim(shows[index]);
+            input = sc.nextLine();
         }
 
         int n = sc.nextInt();
-        int id;
+        sc.nextLine(); // Consumir a quebra de linha após o número
+        
+        for(int i = 0; i < n; i++){
+            linha = sc.nextLine();
+            String[] comandos = linha.split(" ");
+            if(comandos[0].equals("II")){
+                int index = Integer.parseInt(comandos[1].substring(1))-1;
+                lista.inserirInicio(shows[index]);
+            }else if(comandos[0].equals("I*")){
+                int index = Integer.parseInt(comandos[1].substring(1))-1;
+                index = Integer.parseInt(comandos[2].substring(1))-1;
+                lista.inserir(shows[index], Integer.parseInt(comandos[1]));
+            }else if(comandos[0].equals("IF")){
+                int index = Integer.parseInt(comandos[1].substring(1))-1;
+                lista.inserirFim(shows[index]);
+            }else if(comandos[0].equals("RI")){
+                Show tmp =lista.removerInicio();
+                System.out.println("(R) " + tmp.getTitle());
+            }else if(comandos[0].equals("R*")){
+                Show tmp =lista.remover(Integer.parseInt(comandos[1]));
+                System.out.println("(R) " + tmp.getTitle());
+            }else if(comandos[0].equals("RF")){
+                Show tmp =lista.removerFim();
+                System.out.println("(R) " + tmp.getTitle());
+            }
 
-        for (int i = 0; i < n; i++) {
-            String comando = sc.next();
-            if (comando.equals("II")) {
-                getId = sc.next();
-                id = Show.converteStr(getId);
-                try {
-                    lista.inserirInicio(shows[id-1].clone());
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-            if (comando.equals("I*")) {
-                getId = sc.next();
-                int index = Show.converteStr(id);
-                try {
-                    lista.inserir(shows[index], pos);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            } else if (comando.equals("R")) {
-                int pos = sc.nextInt();
-                try {
-                    lista.remover(pos);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            } else if (comando.equals("RI")) {
-                try {
-                    lista.removerInicio(shows[i]);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            } else if (comando.equals("RF")) {
-                try {
-                    lista.removerFim(shows[i]);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            }
         }
-
+        lista.mostrar();
+        
         sc.close();
     }
+}
 
-    public static String log = "874201_quicksortParcial.txt";
-    public static int matricula = 874201;
-    public static int comparacoes = 0;
-    public static int movimentacoes = 0;
+class Lista {
+    private Show[] array;
+    private int n;
+
+    // Construtor da classe Lista
+    public Lista() {
+        array = new Show[1368];
+        n = 0;
+    }
+
+    // Método para inserir no início da lista
+    public void inserirInicio(Show show) //throws Exception 
+    {
+        /*
+        if (n >= array.length) {
+            throw new Exception("Erro ao inserir no inicio!");    
+        }
+        */
+
+        for (int i = n; i > 0; i--) {
+            array[i] = array[i-1];
+        }
+        array[0] = show;
+        n++;
+    }
+
+    // Método para inserir na lista em uma posição específica
+    public void inserir(Show show, int pos) //throws Exception 
+    {
+        /* 
+         if (n >= array.length || pos < 0 || pos > n) {
+            throw new Exception("Erro ao inserir!");    
+        }
+        */
+        
+        for (int i = n; i > pos; i--) {
+            array[i] = array[i-1];
+        }
+        array[pos] = show;
+        n++;
+    }
+
+    // Método para inserir no final da lista
+    public void inserirFim(Show show) //throws Exception 
+    {
+        /*
+        if (n >= array.length) {
+            throw new Exception("Erro ao inserir no fim!");
+        }
+        */
+
+        array[n++] = show;
+    }
+
+    // Métodos para remover no início da lista
+    public Show removerInicio() //throws Exception 
+    {
+        /*
+        if (n <= 0) {
+            throw new Exception("Erro ao remover no inicio!");    
+        }
+        */
+
+        Show tmp = array[0];
+        n--;
+
+        for (int i = 0; i < n; i++) {
+            array[i] = array[i+1];
+        }
+
+        return tmp;
+    }
+
+    // Método para remover em uma posição específica
+    public Show remover(int pos) // throws Exception 
+    {
+        /*
+        if (n <= 0 | pos < 0 || pos > n) {
+            throw new Exception("Erro ao remover!");
+        }
+        */
+
+        Show tmp = array[pos];
+        n--;
+
+        for (int i = pos; i < n; i++) {
+            array[i] = array[i+1];
+        }
+        
+        return tmp;
+    }
+
+    // Método para remover no final da lista
+    public Show removerFim() //throws Exception
+    {
+        /*
+        if (n <= 0) {
+            throw new Exception("Erro ao inserir no fim!");
+        }
+        */
+
+        return array[--n];
+    }
+
+    // Método para mostrar os IDs dos shows na lista
+    public void mostrar() {
+        System.out.println("[");
+        for (int i = 0; i < n; i++) {
+            System.out.print(array[i].getShowId() + " ");
+        }
+        System.out.println("]");
+    }
+
+    // Método para mostrar os shows restantes na lista
+    public void mostraRestantes() {
+        for (int i = 0; i < n; i++) {
+            array[i].imprimir();
+        }
+    }
 }
 
 class Show {
@@ -336,102 +433,5 @@ class Show {
             multiplicador *= 10;
         }
         return valor;
-    }
-}
-
-class Lista {
-    private Show[] array;
-    private int n;
-
-    public Lista() {
-        array = new Show[1368];
-        n = 0;
-    }
-
-    public void inserirInicio(Show show) throws Exception {
-        if (n >= array.length) {
-            throw new Exception("Erro ao inserir no inicio!");    
-        }
-
-        for (int i = n; i > 0; i--) {
-            array[i] = array[i-1];
-        }
-        array[0] = show;
-        n++;
-    }
-
-    public void inserir(Show show, int pos) throws Exception {
-        if (n >= array.length || pos < 0 || pos > n) {
-            throw new Exception("Erro ao inserir!");    
-        }
-        
-        for (int i = n; i > pos; i--) {
-            array[i] = array[i-1];
-        }
-        array[pos] = show;
-        n++;
-    }
-
-    public void inserirFim(Show show) throws Exception {
-        if (n >= array.length) {
-            throw new Exception("Erro ao inserir no fim!");
-        }
-
-        array[n++] = show;
-    }
-
-    public Show removerInicio(Show show) throws Exception {
-        if (n <= 0) {
-            throw new Exception("Erro ao remover no inicio!");    
-        }
-
-        Show tmp = array[0];
-        n--;
-
-        for (int i = 0; i < n; i++) {
-            array[i] = array[i+1];
-        }
-
-        return tmp;
-    }
-
-    public Show remover(int pos) throws Exception {
-        if (n <= 0 | pos < 0 || pos > n) {
-            throw new Exception("Erro ao remover!");
-        }
-
-        Show tmp = array[pos];
-        n--;
-
-        for (int i = pos; i < n; i++) {
-            array[i] = array[i+1];
-        }
-        
-        return tmp;
-    }
-
-    public Show removerFim(Show show) throws Exception {
-        if (n <= 0) {
-            throw new Exception("Erro ao inserir no fim!");
-        }
-
-        return array[--n];
-    }
-
-    /*
-     * FALTA IMPLEMENTAR O MÉTODO MOSTRAR E PESQUISAR
-     */
-    public void mostrar() {
-        System.out.println("[");
-        for (int i = 0; i < n; i++) {
-            System.out.print(array[i].getShowId() + " ");
-        }
-        System.out.println("]");
-    }
-
-    public void mostraRestantes() {
-        for (int i = 0; i < n; i++) {
-            array[i].imprimir();
-        }
     }
 }
