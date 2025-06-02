@@ -1,189 +1,157 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
+import java.util.Arrays;
 
 public class Main {
-
-    // Função Main
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        Show[] shows = new Show[1700];
-        int cont = 0;
-
+        
+        // Carrega todas as linhas do CSV (incluindo header)
         Show.preencher();
-        List<String> lines = Show.getcsv();
-
-        while (!input.equals("FIM")) {
-            int index = Show.converteStr(input);
-
-            if (index >= 0 && index < lines.size()) {
-                Show show = new Show();
-                show.ler(lines.get(index));
-                shows[cont++] = show;
-            }
-            input = sc.nextLine();
-        }
-
-        Lista lista = new Lista(1000);
-        input = sc.nextLine();
-        while (!input.equals("FIM")) {
-            int index = Integer.parseInt(linha.substring(1)) - 1;
-            lista.inserirFim(shows[index]);
-            input = sc.nextLine();
-        }
-
-        int n = sc.nextInt();
-        sc.nextLine(); // Consumir a quebra de linha após o número
+        List<String> rawCsv = Show.getcsv();
         
-        for(int i = 0; i < n; i++){
-            linha = sc.nextLine();
-            String[] comandos = linha.split(" ");
-            if(comandos[0].equals("II")){
-                int index = Integer.parseInt(comandos[1].substring(1))-1;
-                lista.inserirInicio(shows[index]);
-            }else if(comandos[0].equals("I*")){
-                int index = Integer.parseInt(comandos[1].substring(1))-1;
-                index = Integer.parseInt(comandos[2].substring(1))-1;
-                lista.inserir(shows[index], Integer.parseInt(comandos[1]));
-            }else if(comandos[0].equals("IF")){
-                int index = Integer.parseInt(comandos[1].substring(1))-1;
-                lista.inserirFim(shows[index]);
-            }else if(comandos[0].equals("RI")){
-                Show tmp =lista.removerInicio();
-                System.out.println("(R) " + tmp.getTitle());
-            }else if(comandos[0].equals("R*")){
-                Show tmp =lista.remover(Integer.parseInt(comandos[1]));
-                System.out.println("(R) " + tmp.getTitle());
-            }else if(comandos[0].equals("RF")){
-                Show tmp =lista.removerFim();
-                System.out.println("(R) " + tmp.getTitle());
-            }
-
-        }
-        lista.mostrar();
+        // Separa header e dados
+        List<String> csvData = rawCsv.subList(1, rawCsv.size());
         
+        // Pre-carrega todos os shows para facilitar clones
+        Show[] shows = new Show[csvData.size()];
+        for (int i = 0; i < csvData.size(); i++) {
+            shows[i] = new Show();
+            shows[i].ler(csvData.get(i));
+        }
+
+        // Inicia lista e lê IDs iniciais até "FIM"
+        Lista lista = new Lista();
+        String line = sc.nextLine();
+        while (!line.equals("FIM")) {
+            int cont = Show.converteStr(line) - 1;
+            if (cont >= 0 && cont < shows.length) {
+                lista.inserirFim(shows[cont].clone());
+            }
+            line = sc.nextLine();
+        }
+
+        // Processa operações
+        int operacoes = sc.nextInt();
+        for (int i = 0; i < operacoes; i++) {
+            String op = sc.next();
+            switch (op) {
+                case "II": {
+                    String idStr = sc.next();
+                    int cont = Show.converteStr(idStr) - 1;
+                    if (cont >= 0 && cont < shows.length) 
+                        lista.inserirInicio(shows[cont].clone());
+                    break;
+                }
+                case "IF": {
+                    String idStr = sc.next();
+                    int cont = Show.converteStr(idStr) - 1;
+                    if (cont >= 0 && cont < shows.length)
+                        lista.inserirFim(shows[cont].clone());
+                    break;
+                }
+                case "I*": {
+                    int pos = sc.nextInt();
+                    String idStr = sc.next();
+                    int cont = Show.converteStr(idStr) - 1;
+                    if (cont >= 0 && cont < shows.length)
+                        lista.inserir(shows[cont].clone(), pos);
+                    break;
+                }
+                case "RI": {
+                    Show rem = lista.removerInicio();
+                    System.out.println("(R) " + rem.getTitle());
+                    break;
+                }
+                case "RF": {
+                    Show rem = lista.removerFim();
+                    System.out.println("(R) " + rem.getTitle());
+                    break;
+                }
+                case "R*": {
+                    int pos = sc.nextInt();
+                    Show rem = lista.remover(pos);
+                    System.out.println("(R) " + rem.getTitle());
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+        
+        // Imprime os shows restantes
+        lista.mostraRestantes();
         sc.close();
     }
 }
 
 class Lista {
     private Show[] array;
-    private int n;
+    private int tam;
 
-    // Construtor da classe Lista
     public Lista() {
-        array = new Show[1368];
-        n = 0;
+        array = new Show[2000];
+        tam = 0;
     }
 
-    // Método para inserir no início da lista
-    public void inserirInicio(Show show) //throws Exception 
-    {
-        /*
-        if (n >= array.length) {
-            throw new Exception("Erro ao inserir no inicio!");    
-        }
-        */
-
-        for (int i = n; i > 0; i--) {
-            array[i] = array[i-1];
+    public void inserirInicio(Show show) {
+        if (tam >= array.length) return;
+        for (int i = tam; i > 0; i--) {
+            array[i] = array[i - 1];
         }
         array[0] = show;
-        n++;
+        tam++;
     }
 
-    // Método para inserir na lista em uma posição específica
-    public void inserir(Show show, int pos) //throws Exception 
-    {
-        /* 
-         if (n >= array.length || pos < 0 || pos > n) {
-            throw new Exception("Erro ao inserir!");    
+    public void inserir(Show show, int posicao) {
+        if (posicao < 0 || posicao > tam || tam >= array.length) return;
+        for (int i = tam; i > posicao; i--) {
+            array[i] = array[i - 1];
         }
-        */
-        
-        for (int i = n; i > pos; i--) {
-            array[i] = array[i-1];
-        }
-        array[pos] = show;
-        n++;
+        array[posicao] = show;
+        tam++;
     }
 
-    // Método para inserir no final da lista
-    public void inserirFim(Show show) //throws Exception 
-    {
-        /*
-        if (n >= array.length) {
-            throw new Exception("Erro ao inserir no fim!");
+    public void inserirFim(Show show) {
+        if (tam < array.length) {
+            array[tam++] = show;
         }
-        */
-
-        array[n++] = show;
     }
 
-    // Métodos para remover no início da lista
-    public Show removerInicio() //throws Exception 
-    {
-        /*
-        if (n <= 0) {
-            throw new Exception("Erro ao remover no inicio!");    
-        }
-        */
-
+    public Show removerInicio() {
+        if (tam == 0) return null;
         Show tmp = array[0];
-        n--;
-
-        for (int i = 0; i < n; i++) {
-            array[i] = array[i+1];
+        for (int i = 0; i < tam - 1; i++) {
+            array[i] = array[i + 1];
         }
-
+        tam--;
         return tmp;
     }
 
-    // Método para remover em uma posição específica
-    public Show remover(int pos) // throws Exception 
-    {
-        /*
-        if (n <= 0 | pos < 0 || pos > n) {
-            throw new Exception("Erro ao remover!");
+    public Show remover(int posicao) {
+        if (posicao < 0 || posicao >= tam) return null;
+        Show tmp = array[posicao];
+        for (int i = posicao; i < tam - 1; i++) {
+            array[i] = array[i + 1];
         }
-        */
-
-        Show tmp = array[pos];
-        n--;
-
-        for (int i = pos; i < n; i++) {
-            array[i] = array[i+1];
-        }
-        
+        tam--;
         return tmp;
     }
 
-    // Método para remover no final da lista
-    public Show removerFim() //throws Exception
-    {
-        /*
-        if (n <= 0) {
-            throw new Exception("Erro ao inserir no fim!");
-        }
-        */
-
-        return array[--n];
+    public Show removerFim() {
+        if (tam == 0) return null;
+        return array[--tam];
     }
 
-    // Método para mostrar os IDs dos shows na lista
-    public void mostrar() {
-        System.out.println("[");
-        for (int i = 0; i < n; i++) {
-            System.out.print(array[i].getShowId() + " ");
-        }
-        System.out.println("]");
-    }
-
-    // Método para mostrar os shows restantes na lista
     public void mostraRestantes() {
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < tam; i++) {
             array[i].imprimir();
         }
     }
@@ -204,7 +172,7 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static String arq = "/tmp/disneyplus.csv"; // Caminho do arquivo CSV
     private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
