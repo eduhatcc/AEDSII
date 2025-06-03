@@ -600,7 +600,7 @@ void lista_inserirFim(Lista *lista, Show *s) {
 
 void lista_inserir(Lista *lista, Show *s, int pos) {
 	int n = lista_tamanho(lista);
-	if (pos < 0 || pos > lista->tam || lista->tam >= MAX_CAPACITY) return;
+	if (pos < 0 || pos > n || n >= MAX_CAPACITY) return;
 	else if (pos == 0) {
 		inserir_inicio(lista, show);
 	}
@@ -638,8 +638,9 @@ Show *lista_removerFim(Lista *lista) {
 }
 
 Show *lista_remover(Lista *lista, int pos) {
+	Show resp;
 	int n = lista_tamanho(lista);
-    	if (pos < 0 || pos >= lista->tam) return NULL;
+	if (lista->primeiro == lista->ultimo || pos < 0 || pos > n) return NULL;
 	else if (pos == 0) {
 		remover_inicio(lista);
 	}
@@ -648,32 +649,30 @@ Show *lista_remover(Lista *lista, int pos) {
 	}
 	else {
 		int j = 0;
-		Celula *i = lista->primeiro;
+		Celula *i = lista->primeiro->prox;
 
 		while (j < pos) {
 			j++;
 			i = i.prox;
 		}
 
-		Celula *tmp = i;
+		Celula *tmp = i->prox;
 		i->prox = i->prox->prox;
+		
+		resp = clone(*tmp->elemento);
+		tmp->prox = NULL;
+		free(tmp);
+		i = tmp = NULL;
+		
+		return resp;
 	}
-
-    Show *tmp = lista->array[pos];
-
-    for (int i = pos; i < lista->tam - 1; i++) {
-        lista->array[i] = lista->array[i + 1];
-    }
-
-    lista->tam--;
-
-    return tmp;
 }
 
 void lista_mostrar(Lista *lista) {
-    for (int i = 0; i < lista->tam; i++) {
-        print_show(lista->array[i]);
-    }
+    	Celula *i;
+	for (int i = lista->primeiro->prox; i != null; i = i->prox) {
+		print_show(i->elemento);
+	}
 }
 
 int main() {
