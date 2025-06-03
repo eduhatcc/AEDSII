@@ -623,21 +623,41 @@ void lista_inserir(Lista *lista, Show *s, int pos) {
 	}
 }
 
-Show *lista_removerInicio(Lista *lista) {
-    if (lista->tam == 0) return NULL;
+Show *lista_removerInicio(Lista *lista) {	
+    	Celula *tmp = lista->primeiro;
+	lista->primeiro = lista->primeiro->prox;
+	
+    	return tmp;
+}
 
-    Show *tmp = lista->array[0];
-    for (int i = 0; i < lista->tam - 1; i++) {
-        lista->array[i] = lista->array[i + 1];
-    }
+Show *lista_removerFim(Lista *lista) {
+	Celula *tmp = lista->ultimo;
+	lista->ultimo = lista->ultimo->prox;
 
-    lista->tam--;
-
-    return tmp;
+	return tmp
 }
 
 Show *lista_remover(Lista *lista, int pos) {
-    if (pos < 0 || pos >= lista->tam) return NULL;
+	int n = lista_tamanho(lista);
+    	if (pos < 0 || pos >= lista->tam) return NULL;
+	else if (pos == 0) {
+		remover_inicio(lista);
+	}
+	else if (pos == n) {
+		remover_fim(lista);
+	}
+	else {
+		int j = 0;
+		Celula *i = lista->primeiro;
+
+		while (j < pos) {
+			j++;
+			i = i.prox;
+		}
+
+		Celula *tmp = i;
+		i->prox = i->prox->prox;
+	}
 
     Show *tmp = lista->array[pos];
 
@@ -648,12 +668,6 @@ Show *lista_remover(Lista *lista, int pos) {
     lista->tam--;
 
     return tmp;
-}
-
-Show *lista_removerFim(Lista *lista) {
-    if (lista->tam == 0) return NULL;
-
-    return lista->array[--lista->tam];
 }
 
 void lista_mostrar(Lista *lista) {
