@@ -549,50 +549,78 @@ char *strdup_lower(const char *src) {
 }
 
 typedef struct {
-	Show *show;
+	Show *elemento;
 	struct Celula *prox;
 } Celula;
 
-Celula* new_celula(Show *s) {
+Celula* new_celula(Show s) {
 	Celula *tmp = (Celula*)malloc(sizeof(Celula));
-	tmp->show = s;
+	tmp->elemento = (Show*)malloc(sizeof(Show));
+	*tmp->elemento = s;
 	tmp->prox = NULL;
+
+	return tmp;
 }
 
 typedef struct {
-    Show *;
-    int tam;
+    Celula *primeiro;
+    Celula *ultimo;
 } Lista;
 
-void lista_init(Lista *lista) {
-    lista->tam = 0;
+Lista* new_lista() {
+    Lista *tmp = (Lista*)malloc(sizeof(Lista));
+    tmp->primeiro = new_celula();
+    tmp->ultimo = tmp->primeiro;
+
+    return tmp;
+}
+
+int lista_tamanho(Lista *lista) {
+	int n = 0;
+	for (Celula *i = lista->primeiro; i != lista->ultimo; i = i.prox) {
+		n++;
+	}
+
+	return n;
 }
 
 void lista_inserirInicio(Lista *lista, Show *s) {
-    if (lista->tam >= MAX_CAPACITY) return;
-
-    for (int i = lista->tam; i > 0; i--) {
-        lista->array[i] = lista->array[i - 1];
-    }
-    lista->array[0] = s;
-    lista->tam++;
-}
-
-void lista_inserir(Lista *lista, Show *s, int pos) {
-    if (pos < 0 || pos > lista->tam || lista->tam >= MAX_CAPACITY) return;
-
-    for (int i = lista->tam; i > pos; i--) {
-        lista->array[i] = lista->array[i - 1];
-    }
-
-    lista->array[pos] = s;
-    lista->tam++;
+    	Celula *tmp = new_celula(show);
+	tmp->prox = lista->primeiro->prox;
+	lista->primeiro->prox = tmp;
+	tmp = NULL;
 }
 
 void lista_inserirFim(Lista *lista, Show *s) {
-    if (lista->tam < MAX_CAPACITY) {
-        lista->array[lista->tam++] = s;
-    }
+	Celula *tmp = new_celula(show);
+	lista->ultimo->prox = tmp;
+	lista->ultimo = tmp;
+	tmp = NULL;
+}
+
+void lista_inserir(Lista *lista, Show *s, int pos) {
+	int n = lista_tamanho(lista);
+	if (pos < 0 || pos > lista->tam || lista->tam >= MAX_CAPACITY) return;
+	else if (pos == 0) {
+		inserir_inicio(lista, show);
+	}
+	else if (pos == n) {
+		inserir_fim(lista, show);
+	}
+	else {
+		int j = 0;
+		Celula *i = lista->primeiro;
+
+		while (j < pos) {
+			j++;
+			i = i.prox;
+		}
+
+		Celula *tmp = new_celula(show);
+		tmp->prox = i->prox;
+		i->prox = tmp;
+		tmp = i = NULL;
+	}
 }
 
 Show *lista_removerInicio(Lista *lista) {
