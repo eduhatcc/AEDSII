@@ -548,131 +548,146 @@ char *strdup_lower(const char *src) {
     return dup;
 }
 
-typedef struct {
-	Show *elemento;
-	struct Celula *prox;
-} Celula;
 
-Celula* new_celula(Show s) {
-	Celula *tmp = (Celula*)malloc(sizeof(Celula));
-	tmp->elemento = (Show*)malloc(sizeof(Show));
-	*tmp->elemento = s;
-	tmp->prox = NULL;
-
-	return tmp;
-}
+typedef struct Celula Celula;
+struct Celula {
+    Show *elemento;
+    Celula *prox;
+};
 
 typedef struct {
     Celula *primeiro;
     Celula *ultimo;
 } Lista;
 
-Lista* new_lista() {
-    Lista *tmp = (Lista*)malloc(sizeof(Lista));
-    tmp->primeiro = new_celula();
-    tmp->ultimo = tmp->primeiro;
-
+// Create new empty cell (dummy)
+Celula *new_celula() {
+    Celula *tmp = malloc(sizeof(Celula));
+    tmp->elemento = NULL;
+    tmp->prox = NULL;
     return tmp;
 }
 
+// Create new cell holding Show*
+Celula *new_celula_value(Show *s) {
+    Celula *tmp = malloc(sizeof(Celula));
+    tmp->elemento = s;
+    tmp->prox = NULL;
+    return tmp;
+}
+
+// Create new list
+Lista *new_lista() {
+    Lista *lista = malloc(sizeof(Lista));
+    lista->primeiro = new_celula();
+    lista->ultimo = lista->primeiro;
+    return lista;
+}
+
+// Return number of elements
 int lista_tamanho(Lista *lista) {
-	int n = 0;
-	for (Celula *i = lista->primeiro; i != lista->ultimo; i = i.prox) {
-		n++;
-	}
-
-	return n;
+    int n = 0;
+    for (Celula *i = lista->primeiro->prox; i != NULL; i = i->prox) {
+        n++;
+    }
+    return n;
 }
 
+// Insert at beginning
 void lista_inserirInicio(Lista *lista, Show *s) {
-    	Celula *tmp = new_celula(show);
-	tmp->prox = lista->primeiro->prox;
-	lista->primeiro->prox = tmp;
-	tmp = NULL;
+    Celula *tmp = new_celula_value(s);
+    tmp->prox = lista->primeiro->prox;
+    lista->primeiro->prox = tmp;
+    if (lista->ultimo == lista->primeiro) {
+        lista->ultimo = tmp;
+    }
 }
 
+// Insert at end
 void lista_inserirFim(Lista *lista, Show *s) {
-	Celula *tmp = new_celula(show);
-	lista->ultimo->prox = tmp;
-	lista->ultimo = tmp;
-	tmp = NULL;
+    Celula *tmp = new_celula_value(s);
+    lista->ultimo->prox = tmp;
+    lista->ultimo = tmp;
 }
 
 void lista_inserir(Lista *lista, Show *s, int pos) {
-	int n = lista_tamanho(lista);
-	if (pos < 0 || pos > n || n >= MAX_CAPACITY) return;
-	else if (pos == 0) {
-		inserir_inicio(lista, show);
-	}
-	else if (pos == n) {
-		inserir_fim(lista, show);
-	}
-	else {
-		int j = 0;
-		Celula *i = lista->primeiro;
+    int n = lista_tamanho(lista);
+    if (pos < 0 || pos > n) return;
+    else if (pos == 0) {
+	    lista_inserirInicio(lista, s);
+    }
+    else if (pos == n) {
+	    lista_inserirFim(lista, s);
+    }
+    else {
+	    int i = 0;
+	    Celula *j = lista->primeiro;
 
-		while (j < pos) {
-			j++;
-			i = i.prox;
-		}
+    	    while (i < pos) {
+		    i++;
+		    j = j->prox;
+	    }
 
-		Celula *tmp = new_celula(show);
-		tmp->prox = i->prox;
-		i->prox = tmp;
-		tmp = i = NULL;
-	}
+    	    Celula *tmp = new_celula_value(s);
+	    tmp->prox = j->prox;
+	    j->prox = tmp;
+	    tmp = j = NULL;
+    }
 }
 
-Show *lista_removerInicio(Lista *lista) {	
-    	Celula *tmp = lista->primeiro;
-	lista->primeiro = lista->primeiro->prox;
-	
-    	return tmp;
+// Remove from beginning, return Show* or NULL
+Show *lista_removerInicio(Lista *lista) {
+    if (lista->primeiro == lista->ultimo) {
+        return NULL;
+    }
+    Celula *toRemove = lista->primeiro->prox;
+    Show *ret = toRemove->elemento;
+    lista->primeiro->prox = toRemove->prox;
+    if (toRemove == lista->ultimo) {
+        lista->ultimo = lista->primeiro;
+    }
+    free(toRemove);
+    return ret;
 }
 
+// Remove from end, return Show* or NULL
 Show *lista_removerFim(Lista *lista) {
-	Celula *tmp = lista->ultimo;
-	lista->ultimo = lista->ultimo->prox;
-
-	return tmp
+    if (lista->primeiro == lista->ultimo) {
+        return NULL;
+    }
+    Celula *prev;
+    for (prev = lista->primeiro; prev->prox != lista->ultimo; prev = prev->prox);
+    Celula *toRemove = lista->ultimo;
+    Show *ret = toRemove->elemento;
+    prev->prox = NULL;
+    lista->ultimo = prev;
+    free(toRemove);
+    return ret;
 }
 
+// Remove at position, return Show* or NULL
 Show *lista_remover(Lista *lista, int pos) {
-	Show resp;
-	int n = lista_tamanho(lista);
-	if (lista->primeiro == lista->ultimo || pos < 0 || pos > n) return NULL;
-	else if (pos == 0) {
-		remover_inicio(lista);
-	}
-	else if (pos == n) {
-		remover_fim(lista);
-	}
-	else {
-		int j = 0;
-		Celula *i = lista->primeiro->prox;
-
-		while (j < pos) {
-			j++;
-			i = i.prox;
-		}
-
-		Celula *tmp = i->prox;
-		i->prox = i->prox->prox;
-		
-		resp = clone(*tmp->elemento);
-		tmp->prox = NULL;
-		free(tmp);
-		i = tmp = NULL;
-		
-		return resp;
-	}
+    int n = lista_tamanho(lista);
+    if (pos < 0 || pos >= n) return NULL;
+    Celula *prev = lista->primeiro;
+    for (int i = 0; i < pos; i++) {
+        prev = prev->prox;
+    }
+    Celula *toRemove = prev->prox;
+    Show *ret = toRemove->elemento;
+    prev->prox = toRemove->prox;
+    if (toRemove == lista->ultimo) {
+        lista->ultimo = prev;
+    }
+    free(toRemove);
+    return ret;
 }
 
+// Print list
 void lista_mostrar(Lista *lista) {
-    	Celula *i;
-	for (int i = lista->primeiro->prox; i != null; i = i->prox) {
-		print_show(i->elemento);
-	}
+    for (Celula *i = lista->primeiro->prox; i != NULL; i = i->prox) {
+        print_show(i->elemento);
+    }
 }
 
 int main() {
@@ -688,8 +703,7 @@ int main() {
     }
 
     // Inicia lista e lê IDs iniciais até "FIM"
-    Lista lista;
-    lista_init(&lista);
+    Lista *lista = new_lista();
     char buffer[256];
     bool fim = false;
     while (!fim)  {
@@ -702,7 +716,7 @@ int main() {
         else {
             int idx = convert_str_to_int(buffer) - 1;
             if (idx >= 0 && idx < data_count) {
-                lista_inserirFim(&lista, &shows[idx]);
+                lista_inserirFim(lista, &shows[idx]);
             }
         }
     }
@@ -714,6 +728,7 @@ int main() {
         free_csv_lines();
         return 1;
     }
+
     for (int i = 0; i < operacoes; i++) {
         char op[3];
         scanf("%2s", op);
@@ -724,7 +739,7 @@ int main() {
 
             int idx = convert_str_to_int(idStr) - 1;
             if (idx >= 0 && idx < data_count) {
-                lista_inserirInicio(&lista, &shows[idx]);
+                lista_inserirInicio(lista, &shows[idx]);
             }
         } 
         else if (strcmp(op, "IF") == 0) {
@@ -733,7 +748,7 @@ int main() {
 
             int idx = convert_str_to_int(idStr) - 1;
             if (idx >= 0 && idx < data_count) {
-                lista_inserirFim(&lista, &shows[idx]);
+                lista_inserirFim(lista, &shows[idx]);
             }
         } 
         else if (strcmp(op, "I*") == 0) {
@@ -743,17 +758,17 @@ int main() {
 
             int idx = convert_str_to_int(idStr) - 1;
             if (idx >= 0 && idx < data_count) {
-                lista_inserir(&lista, &shows[idx], pos);
+                lista_inserir(lista, &shows[idx], pos);
             }
         } 
         else if (strcmp(op, "RI") == 0) {
-            Show *rem = lista_removerInicio(&lista);
+            Show *rem = lista_removerInicio(lista);
             if (rem) {
                 printf("(R) %s\n", rem->title);
             }
         } 
         else if (strcmp(op, "RF") == 0) {
-            Show *rem = lista_removerFim(&lista);
+            Show *rem = lista_removerFim(lista);
             if (rem) {
                 printf("(R) %s\n", rem->title);
             }
@@ -762,7 +777,7 @@ int main() {
             int pos; 
             scanf("%d", &pos);
 
-            Show *rem = lista_remover(&lista, pos);
+            Show *rem = lista_remover(lista, pos);
             if (rem) {
                 printf("(R) %s\n", rem->title);
             }
@@ -770,7 +785,7 @@ int main() {
     }
 
     // Imprime shows restantes
-    lista_mostrar(&lista);
+    lista_mostrar(lista);
 
     free(shows);
     free_csv_lines();
