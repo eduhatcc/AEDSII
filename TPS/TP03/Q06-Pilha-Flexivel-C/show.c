@@ -561,6 +561,7 @@ typedef struct {
 Celula *new_celula() {
     Celula *tmp = malloc(sizeof(Celula));
     tmp->elemento = NULL;
+    
     return tmp;
 }
 
@@ -569,6 +570,7 @@ Celula *new_celula_value(Show *s) {
     Celula *tmp = malloc(sizeof(Celula));
     tmp->elemento = s;
     tmp->prox = NULL;
+    
     return tmp;
 }
 
@@ -576,30 +578,46 @@ Celula *new_celula_value(Show *s) {
 Pilha *new_pilha() {
     Pilha *p = malloc(sizeof(Pilha));
     p->topo = new_celula();
+
     return p;
 }
 
 // Insert at end
 void pilha_inserir(Pilha *p, Show *s) {
     Celula *tmp = new_celula_value(s);
-    tmp->prox = p->topo;
-    p->topo = tmp;
+    tmp->prox = p->topo->prox;
+    p->topo->prox = tmp;
+    tmp = NULL;
 }
 
 // Remove from end, return Show* or NULL
 Show *pilha_remover(Pilha *p) {
-    if (p->topo == NULL) return NULL;
+    if (p->topo->prox == NULL) return NULL;
     
-    Celula *tmp = p->topo;
-    Show *ret = tmp->elemento;
-    p->topo = NULL;
+    Celula *tmp = p->topo->prox;
+    Show *rem = tmp->elemento;
+    p->topo->prox = p->topo->prox->prox;
+    tmp->prox = NULL;
+    free(tmp);
     
-    return ret;
+    return rem;
 }
+
+int pilha_tamanho(Pilha *p) {
+    int n = 0;
+    for (Celula *i = p->topo->prox; i != NULL; i = i->prox) {
+	    n++;
+    }
+	
+    return n;
+}
+
 // Print list
 void pilha_mostrar(Pilha *p) {
-    for (Celula *i = p->topo; i != NULL; i = i->prox) {
-        print_show(i->elemento);
+    int n = pilha_tamanho(p);
+    for (Celula *i = p->topo->prox; i != NULL; i = i->prox) {
+	    printf("[%d] ", --n);
+	    print_show(i->elemento);
     }
 }
 
