@@ -70,49 +70,40 @@ class Pilha {
     private Celula topo;
 
     public Pilha() {
-        Celula tmp = new Celula();
-	tmp.Celula();
-	tmp.setTopo(null);
+        topo = null;
     }
 
-    public void setTopo(Celula topo) {
-	    this.topo = topo;
-    }
-    public Celula getTopo() {
-	    return this.topo;
-    }
-
-    public void inserir(Pilha p, Show s) {
-        Celula tmp = new Celula();
-	tmp.getProx() = p.getTopo().getProx();
-	p.getTopo().getProx() = tmp;
-	tmp = null;
+    public void inserir(Show s) {
+        Celula tmp = new Celula(s);
+	    tmp.setProx(topo);
+	    topo = tmp;
     }
 
-    public Show remover(Pilha p) {
-        if (p.getTopo().getProx() == null) return null;
+    public Show remover() {
+        if (topo == null) return null;
         
-	Celula tmp = p.getTopo().getProx();
-	Show rem = tmp.getElemento();
-	p.getTopo().getProx() = p.getTopo().getProx().getProx();
+	    Show tmp = topo.getElemento();
+        topo = topo.getProx();
 
-	return rem;
+	    return tmp;
     }
 
-    public int pilha_tamanho(Pilha p) {
-	int n = 0;
-	for(Celula i = p.getTopo().getProx(); i != null; i = i.getProx()) {
-		n++;
-	}
+    public int tamanho() {
+	    int n = 0;
 
-	return n;
+	    for(Celula i = topo; i != null; i = i.getProx()) {
+	    	n++;
+	    }
+
+	    return n;
     }
 
-    public void pilha_mostrar(Pilha p) {
-	int n = pilha_tamanho(p);
-        for (Celula i = p.getTopo().getProx(); i != null; i = i.getProx()) {
-	     System.out.print(--n + " ");
-	     p.imprimir();
+    public void mostrar() {
+	    int n = tamanho();
+
+        for (Celula i = topo; i != null; i = i.getProx()) {
+	        System.out.print("[" + --n  + "]"+ " ");
+	        i.getElemento().imprimir();
         }
     }
 }
@@ -132,10 +123,10 @@ class Celula {
 	}
 
 	public void setElemento(Show s) {
-		this.elemento = elemento;
+		this.elemento = s;
 	}
 	public Show getElemento() {
-		return this.elemento();
+		return this.elemento;
 	}
 
 	public void setProx(Celula prox) {
