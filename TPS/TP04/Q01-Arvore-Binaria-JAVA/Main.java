@@ -47,6 +47,7 @@ public class Main {
 		else {
 			System.out.println("NAO");
 		}
+		line = sc.nextLine();
 	}
         
         sc.close();
@@ -89,9 +90,9 @@ class No {
 		return this.elemento;
 	}
 
-	/*
-	 * IMPLEMENTAR O MÉTODO GET TITLE
-	 */
+	public String getTitle() {
+		return this.elemento.getTitle();
+	}
 }
 
 class Arvore {
@@ -105,38 +106,33 @@ class Arvore {
 	    if (i == null) {
 		    i = new No(s);
 	    }
-
-	    /*
-	     * CONSERTAR CHAMADAS USANDO GET
-	     */
-	    else if (i < i.getElemento().getTitle()) {
+	    else if (s.getTitle().compareToIgnoreCase(i.getElemento().getTitle()) < 0) {
 		    i.setEsq(inserir(i.getEsq(), s));
 	    }
-	    else if (i > i.getElemento().getTitle()) {
-		    i.setDir(inserir(i.dir, s));
+	    else if (s.getTitle().compareToIgnoreCase(i.getElemento().getTitle()) > 0) {
+		    i.setDir(inserir(i.getDir(), s));
 	    }
 
 	    return i;
     }
 
     public void inserir(Show s) {
-	    return inserir(raiz, s);
+	    raiz = inserir(raiz, s);
     }
 
     private boolean pesquisar(No i, String line) {
 	    boolean encontrou = false;
-
 	    if (i != null) {
 		    if (i.getTitle().equals(line)) {
 			    encontrou = true;
 		    }
-		    else if (line < i.getTitle()) {
+		    else if (line.compareToIgnoreCase(i.getTitle()) < 0) {
 			    System.out.print("esq ");
-			    encontrou = pesquisar(i.esq, line);
+			    encontrou = pesquisar(i.getEsq(), line);
 		    }
 		    else {
 			    System.out.print("dir ");
-			    encontrou = pesquisar(i.dir, line);
+			    encontrou = pesquisar(i.getDir(), line);
 		    }
 	    }
 
@@ -144,7 +140,7 @@ class Arvore {
     }
 
     public boolean pesquisar(String line) {
-	    System.out.print("=>raiz ");
+	    System.out.print("=>raiz  ");
 	    return pesquisar(raiz, line);
     }
 }
@@ -165,7 +161,7 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static String arq = "/tmp/disneyplus.csv"; // Caminho do arquivo CSV
     private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
