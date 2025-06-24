@@ -1,15 +1,11 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
-import java.util.Arrays;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 
 public class Main {
+    public static String log = "874201_arvoreBinaria.txt";
+    public static int matricula = 874201;
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         
@@ -40,6 +36,7 @@ public class Main {
 
         // Processa operações
 	line = sc.nextLine();
+	long start = System.nanoTime();
 	while(!line.equals("FIM"))  {
 	    	if (arvore.pesquisar(line)) {
 			System.out.println("SIM");
@@ -49,7 +46,14 @@ public class Main {
 		}
 		line = sc.nextLine();
 	}
-        
+	long end = System.nanoTime();
+        double tempo = (end - start) / 1e6; // em milissegundos
+
+	try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
+            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, arvore.comparacoes, tempo));
+        }
+        catch(Exception e) {}
+
         sc.close();
     }
 }
@@ -97,6 +101,7 @@ class No {
 
 class Arvore {
     private No raiz;
+    public static int comparacoes = 0;
 
     public Arvore() {
 	    this.raiz = null;
@@ -104,12 +109,15 @@ class Arvore {
 
     private No inserir(No i, Show s) {
 	    if (i == null) {
+		    comparacoes++;
 		    i = new No(s);
 	    }
 	    else if (s.getTitle().compareToIgnoreCase(i.getElemento().getTitle()) < 0) {
+		    comparacoes += 2;
 		    i.setEsq(inserir(i.getEsq(), s));
 	    }
 	    else if (s.getTitle().compareToIgnoreCase(i.getElemento().getTitle()) > 0) {
+		    comparacoes += 3;
 		    i.setDir(inserir(i.getDir(), s));
 	    }
 
@@ -122,15 +130,19 @@ class Arvore {
 
     private boolean pesquisar(No i, String line) {
 	    boolean encontrou = false;
+	    comparacoes++;
 	    if (i != null) {
 		    if (i.getTitle().equals(line)) {
+			    comparacoes++;
 			    encontrou = true;
 		    }
 		    else if (line.compareToIgnoreCase(i.getTitle()) < 0) {
+			    comparacoes += 2;
 			    System.out.print("esq ");
 			    encontrou = pesquisar(i.getEsq(), line);
 		    }
 		    else {
+			    comparacoes += 2;
 			    System.out.print("dir ");
 			    encontrou = pesquisar(i.getDir(), line);
 		    }
@@ -144,7 +156,6 @@ class Arvore {
 	    return pesquisar(raiz, line);
     }
 }
-   
 
 class Show {
     // Atributos da classe Show
@@ -161,7 +172,7 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private static String arq = "/tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
     private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
