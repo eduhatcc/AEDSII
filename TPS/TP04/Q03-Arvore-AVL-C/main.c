@@ -548,7 +548,6 @@ char *strdup_lower(const char *src) {
     return dup;
 }
 
-
 typedef struct No {
     Show *elemento;
     struct No *esq;
@@ -616,13 +615,13 @@ No *inserir_avl(No *i, Show *s) {
         i = new_no_value(s); // Create a new node
     }
     else {
-        int cmp = strcmp(i->elemento->title, s->title);
+        int cmp = strcmp(s->title, i->elemento->title);
         if (cmp < 0) {
-            printf(" ==== TESTE INSERIR ESQUERDA ====\n");
+            printf(" ==== TESTE INSERIR DIREITA ====\n");
             i->esq = inserir_avl(i->esq, s); // Insert in right subtree
         }
         else if(cmp > 0) {
-            printf("===== TESTE INSERIR DIREITA =====\n");
+            printf("===== TESTE INSERIR ESQUERDA =====\n");
             i->dir = inserir_avl(i->dir, s); // Insert in left subtree
         }
         else {
@@ -630,44 +629,43 @@ No *inserir_avl(No *i, Show *s) {
             return i;
         }
 
-        i->altura = 1 + max(altura(i->esq), altura(i->dir));
-        int balance = get_balance(i);
+    	i->altura = 1 + max(altura(i->esq), altura(i->dir));
+	int balance = get_balance(i);
 
-        if (balance > 1 && strcmp(s->title, i->esq->elemento->title) < 0) {
-            i = rotacionar_direita(i); // Right rotation
-        }
-        else if (balance < -1 && strcmp(s->title, i->dir->elemento->title) > 0) {
-            i = rotacionar_esquerda(i); // Left rotation
-        }
-        // Left Right
-        if (balance > 1 && strcmp(s->title, i->esq->elemento->title) > 0) {
-            i->esq = rotacionar_esquerda(i->esq); // Left 
-            i = rotacionar_direita(i); // Right
-        }
-        // Right Left
-        if (balance < -1 && strcmp(s->title, i->dir->elemento->title) < 0) {
-            i->dir = rotacionar_direita(i->dir); // Right
-            i = rotacionar_esquerda(i);  // Left
-        }
+	if (balance > 1 && strcmp(s->title, i->esq->elemento->title) < 0) {
+		i = rotacionar_direita(i); // Right rotation
+	}
+	else if (balance < -1 && strcmp(s->title, i->dir->elemento->title) > 0) {
+		i = rotacionar_esquerda(i); // Left rotation
+	}
+	// Left Right
+	if (balance > 1 && strcmp(s->title, i->esq->elemento->title) > 0) {
+		i->esq = rotacionar_esquerda(i->esq); // Left 
+		i = rotacionar_direita(i); // Right
+	}
+	// Right Left
+	if (balance < -1 && strcmp(s->title, i->dir->elemento->title) < 0) {
+		i->dir = rotacionar_direita(i->dir); // Right
+		i = rotacionar_esquerda(i);  // Left
+	}
+
+	return i;
     }
-
-    return i;
 }
-
-bool pesquisar_avl(No *raiz, char *key) {
+bool pesquisar_avl(No *i, char *key) {
     bool encontrou = false;
-    if (raiz != NULL) {
-        int cmp = strcmp(raiz->elemento->title, key);
+    if (i != NULL) {
+        int cmp = strcmp(i->elemento->title, key);
         if (cmp == 0) {
             encontrou = true; // Found
         } 
         else if (cmp < 0) {
             printf("esq ");
-            encontrou = pesquisar_avl(raiz->dir, key); // Search right
+            encontrou = pesquisar_avl(i->dir, key); // Search right
         } 
         else {
             printf("dir ");
-            encontrou = pesquisar_avl(raiz->esq, key); // Search left
+            encontrou = pesquisar_avl(i->esq, key); // Search left
         }
     }
     return encontrou;
