@@ -113,7 +113,7 @@ class Hash {
 		int x = ASCII_title(line);
 		int pos = hash(x);
 		
-		System.out.print("(Posicao: " + pos + ") ");
+		System.out.print(" (Posicao: " + pos + ") ");
 		if (tabela[pos] != null && tabela[pos].getTitle().compareToIgnoreCase(line) == 0) {
 			encontrou = true;
 		}
@@ -147,7 +147,7 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private static String arq = "/tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
     private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
