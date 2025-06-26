@@ -3,7 +3,7 @@ import java.text.*;
 import java.util.*;
 
 public class Main {
-    public static String log = "874201_arvoreBinaria.txt";
+    public static String log = "874201_alvinegra.txt";
     public static int matricula = 874201;
 
     public static void main(String[] args) {
@@ -71,7 +71,7 @@ class No {
 	}
 
 	public No(Show elemento, boolean cor) {
-		No(elemento, this.esq, this.dir, cor)
+		this(elemento, null, null, cor);
 	}
 
 	public No(Show elemento, No esq, No dir, boolean cor) {
@@ -79,6 +79,10 @@ class No {
 		this.esq = esq;
 		this.dir = dir;
 		this.cor = cor;
+	}
+
+	public void setElemento(Show elemento) {
+		this.elemento = elemento;
 	}
 
 	public void setEsq(No esq) {
@@ -142,38 +146,46 @@ class Alvinegra {
 
     private void inserir(Show s, No bisavo, No avo, No pai, No i) {
 	    if (i == null) {
-		    if (s.getTitle().compareToIgnoreCase(pai.getElemento().getName()) < 0) {
-			    i = pai.setEsq(new No(s, true));
+		    if (s.getTitle().compareToIgnoreCase(pai.getElemento().getTitle()) < 0) {
+			    comparacoes++;
+			    pai.setEsq(new No(s, true));
+			    i = pai.getEsq();
 		    }
 		    else {
-			    i = pai.setDir(new No(x, true));
+			    pai.setDir(new No(s, true));
+			    i = pai.getDir();
 		    }
 
 		    if (pai.getCor() == true) {
+			    comparacoes++;
 			    balancear(bisavo, avo, pai, i);
 		    }
 	    }
 	    else {
 		    if (i.getEsq() != null && i.getDir() != null && i.getEsq().getCor() == true && i.getDir().getCor() == true) {
+			    comparacoes++;
+
 			    i.setCor(true);
 			    i.getEsq().setCor(false);
-			    i.getDir().setCor(true);
+			    i.getDir().setCor(false);
 
 			    if (i == raiz) {
+				    comparacoes++;
 				    i.setCor(false);
 			    }
 			    else if (pai.getCor() == true) {
+				    comparacoes += 2;
 				    balancear(bisavo, avo, pai, i);
 			    }
 		    }
 
 		    if (s.getTitle().compareToIgnoreCase(i.getElemento().getTitle()) < 0) {
-			    inserir(s, avo, pai, i. i.getEsq());
+			    comparacoes++;
+			    inserir(s, avo, pai, i, i.getEsq());
 		    }
 		    else if (s.getTitle().compareToIgnoreCase(i.getElemento().getTitle()) > 0) {
-			    /*
-			     * TERMINAR IMPLEMENTAÇÃO
-			     */
+			    comparacoes += 2;
+			    inserir(s, avo, pai, i, i.getDir());
 		    }
 	    }
     }
@@ -181,11 +193,15 @@ class Alvinegra {
     public void inserir(Show s) {
 	    // Se a árvore estiver vazia
 	    if (raiz == null) {
+		    comparacoes++;
 		    raiz = new No(s);
 	    }
+	    /*
 	    // Senão, se a árvore tiver um elemento inserido
 	    else if (raiz.getEsq() == null && raiz.getDir() == null) {
+		    comparacoes += 2;
 		    if (s.getTitle().compareToIgnoreCase(raiz.getElemento().getTitle()) < 0) {
+			    comparacoes++;
 			    raiz.setEsq(new No(s));
 		    }
 		    else {
@@ -194,25 +210,99 @@ class Alvinegra {
 	    }
 	    // Senão, se a árvore tiver dois elementos (raiz e dir)
 	    else if (raiz.getEsq() == null) {
+		    comparacoes++;
 		    if (s.getTitle().compareToIgnoreCase(raiz.getElemento().getTitle()) < 0) {
+			    comparacoes++;
 			    raiz.setEsq(new No(s));
 		    }
 		    else if (s.getTitle().compareToIgnoreCase(raiz.getDir().getElemento().getTitle()) < 0) {
+			    comparacoes += 2;
 			    raiz.setEsq(new No(s));
-			    raiz.setElemento(raiz.getElemento());
 		    }
 		    else {
-			    raiz.setEsq(new No(s);
+			    raiz.setEsq(new No(s));
 			    raiz.setElemento(raiz.getDir().getElemento());
 			    raiz.getDir().setElemento(s);
 		    }
 		    raiz.getEsq().setCor(false);
 		    raiz.getDir().setCor(false);
 	    }
+	    */
 	    else {
 		    inserir(s, null, null, null, raiz);
 	    }
 	    raiz.setCor(false);
+    }
+
+    private No rotacaoDir(No no) {
+	    No noEsq = no.getEsq();
+	    No noEsqDir = noEsq.getDir();
+
+	    noEsq.setDir(no);
+	    no.setEsq(noEsqDir);
+
+	    return noEsq;
+    }
+
+    private No rotacaoEsq(No no) {
+	    No noDir = no.getDir();
+	    No noDirEsq = noDir.getEsq();
+
+	    noDir.setEsq(no);
+	    no.setDir(noDirEsq);
+
+	    return noDir;
+    }
+
+    private No rotacaoDirEsq(No no) {
+	    no.setDir(rotacaoDir(no.getDir()));
+	    return rotacaoEsq(no);
+    }
+
+    private No rotacaoEsqDir(No no) {
+	    no.setEsq(rotacaoEsq(no.getEsq()));
+	    return rotacaoDir(no);
+    }
+
+    private void balancear(No bisavo, No avo, No pai, No i) {
+	    if (pai.getCor() == true) {
+		    comparacoes++;
+		    if (pai.getElemento().getTitle().compareToIgnoreCase(avo.getElemento().getTitle()) > 0) {
+			    comparacoes++;
+			    if (i.getElemento().getTitle().compareToIgnoreCase(pai.getElemento().getTitle()) > 0) {
+				    comparacoes++;
+				    avo = rotacaoEsq(avo);
+			    }
+			    else {
+				    avo = rotacaoDirEsq(avo);
+			    }
+		    }
+		    else {
+			    if (i.getElemento().getTitle().compareToIgnoreCase(pai.getElemento().getTitle()) < 0) {
+				    comparacoes++;
+				    avo = rotacaoDir(avo);
+			    }
+			    else {
+				    avo = rotacaoEsqDir(avo);
+			    }
+		    }
+
+		    if (bisavo == null) {
+			    comparacoes++;
+			    raiz = avo;
+		    }
+		    else if (avo.getElemento().getTitle().compareToIgnoreCase(bisavo.getElemento().getTitle()) < 0) {
+			    comparacoes += 2;
+			    bisavo.setEsq(avo);
+		    }
+		    else {
+			    bisavo.setDir(avo);
+		    }
+
+		    avo.setCor(false);
+		    avo.getEsq().setCor(true);
+		    avo.getDir().setCor(true);
+	    }
     }
 
     private boolean pesquisar(No i, String line) {
