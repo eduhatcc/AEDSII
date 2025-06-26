@@ -11,8 +11,7 @@
 
 char **csv_lines = NULL;
 int csv_line_count = 0,
-    comparacoes = 0,
-    movimentacoes = 0;
+    comparacoes = 0;
 
 typedef struct {
     char show_id[50];
@@ -567,11 +566,13 @@ No *new_no_value(Show *s) {
 
 // Height of the tree
 int altura(No *no) {
+    comparacoes++;
     return no ? no->altura : 0;
 }
 
 // Calculate balance factor of a node
 int max(int a, int b) {
+    comparacoes++;
     return (a > b) ? a : b;
 }
 
@@ -612,14 +613,17 @@ int get_balance(No *no) {
 
 No *inserir_avl(No *i, Show *s) {
     if (i == NULL) {
+	comparacoes++;
         i = new_no_value(s); // Create a new node
     }
     else {
         int cmp = strcmp(s->title, i->elemento->title);
         if (cmp < 0) {
+		comparacoes++;
             i->esq = inserir_avl(i->esq, s); // Insert in right subtree
         }
         else if(cmp > 0) {
+	    comparacoes += 2;
             i->dir = inserir_avl(i->dir, s); // Insert in left subtree
         }
         else {
@@ -631,16 +635,20 @@ No *inserir_avl(No *i, Show *s) {
 	int balance = get_balance(i);
 
 	if (balance > 1 && strcmp(s->title, i->esq->elemento->title) < 0) {
+		comparacoes++;
 		i = rotacionar_direita(i); // Right rotation
 	}
 	else if (balance < -1 && strcmp(s->title, i->dir->elemento->title) > 0) {
+		comparacoes += 2;
 		i = rotacionar_esquerda(i); // Left rotation
 	}
 	else if (balance > 1 && strcmp(s->title, i->esq->elemento->title) > 0) {
+		comparacoes += 3;
 		i->esq = rotacionar_esquerda(i->esq); // Left 
 		i = rotacionar_direita(i); // Right
 	}
 	else if (balance < -1 && strcmp(s->title, i->dir->elemento->title) < 0) {
+		comparacoes += 4;
 		i->dir = rotacionar_direita(i->dir); // Right
 		i = rotacionar_esquerda(i);  // Left
 	}
@@ -648,14 +656,18 @@ No *inserir_avl(No *i, Show *s) {
 	return i;
     }
 }
+
 bool pesquisar_avl(No *i, char *key) {
     bool encontrou = false;
     if (i != NULL) {
+	comparacoes++;
         int cmp = strcmp(i->elemento->title, key);
         if (cmp == 0) {
+	    comparacoes += 2;
             encontrou = true; // Found
         } 
         else if (cmp < 0) {
+	    comparacoes += 3;
             printf("dir ");
             encontrou = pesquisar_avl(i->dir, key); // Search right
         } 
@@ -698,6 +710,7 @@ int main() {
         }
     }
 
+    clock_t start = clock();
     fim = false;
     while (!fim) {
         fgets(buffer, sizeof(buffer), stdin);
@@ -714,6 +727,14 @@ int main() {
                 printf("NAO\n");
             }
         }
+    }
+    clock_t end = clock();
+    double time = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
+
+    FILE *log = fopen("874201_avl.txt", "w");
+    if (log) {
+	    fprintf(log, "874201\t%d\t%.2f\n", comparacoes, time);
+	    fclose(log);
     }
 
     free(shows);
