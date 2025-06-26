@@ -617,11 +617,9 @@ No *inserir_avl(No *i, Show *s) {
     else {
         int cmp = strcmp(s->title, i->elemento->title);
         if (cmp < 0) {
-            printf(" ==== TESTE INSERIR DIREITA ====\n");
             i->esq = inserir_avl(i->esq, s); // Insert in right subtree
         }
         else if(cmp > 0) {
-            printf("===== TESTE INSERIR ESQUERDA =====\n");
             i->dir = inserir_avl(i->dir, s); // Insert in left subtree
         }
         else {
@@ -638,13 +636,11 @@ No *inserir_avl(No *i, Show *s) {
 	else if (balance < -1 && strcmp(s->title, i->dir->elemento->title) > 0) {
 		i = rotacionar_esquerda(i); // Left rotation
 	}
-	// Left Right
-	if (balance > 1 && strcmp(s->title, i->esq->elemento->title) > 0) {
+	else if (balance > 1 && strcmp(s->title, i->esq->elemento->title) > 0) {
 		i->esq = rotacionar_esquerda(i->esq); // Left 
 		i = rotacionar_direita(i); // Right
 	}
-	// Right Left
-	if (balance < -1 && strcmp(s->title, i->dir->elemento->title) < 0) {
+	else if (balance < -1 && strcmp(s->title, i->dir->elemento->title) < 0) {
 		i->dir = rotacionar_direita(i->dir); // Right
 		i = rotacionar_esquerda(i);  // Left
 	}
@@ -660,11 +656,11 @@ bool pesquisar_avl(No *i, char *key) {
             encontrou = true; // Found
         } 
         else if (cmp < 0) {
-            printf("esq ");
+            printf("dir ");
             encontrou = pesquisar_avl(i->dir, key); // Search right
         } 
         else {
-            printf("dir ");
+            printf("esq ");
             encontrou = pesquisar_avl(i->esq, key); // Search left
         }
     }
@@ -711,7 +707,7 @@ int main() {
             fim = true;
         } 
         else {
-            printf("=>raiz  ");
+            printf("raiz  ");
             if(pesquisar_avl(raiz, buffer)) {
                 printf("SIM\n");
             } else {
