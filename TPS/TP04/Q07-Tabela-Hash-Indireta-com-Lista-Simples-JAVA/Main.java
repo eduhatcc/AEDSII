@@ -3,7 +3,7 @@ import java.text.*;
 import java.util.*;
 
 public class Main {
-    public static String log = "874201_hashRehash.txt";
+    public static String log = "874201_hashIndireta.txt";
     public static int matricula = 874201;
 
     public static void main(String[] args) {
@@ -24,7 +24,7 @@ public class Main {
         }
 
         // Inicia lista e lê IDs iniciais até "FIM"
-        Hash hash = new Hash();
+        HashIndireta hash = new HashIndireta();
         String line = sc.nextLine();
         while (!line.equals("FIM")) {
             int cont = Show.converteStr(line) - 1;
@@ -50,7 +50,7 @@ public class Main {
         double tempo = (end - start) / 1e6; // em milissegundos
 
 	try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, hash.comparacoes, tempo));
+            bw.write(String.format("%s\t%d\t%.2f\n", matricula, hash.getTotalComparacoes(), tempo));
         }
         catch(Exception e) {}
 
@@ -58,19 +58,71 @@ public class Main {
     }
 }
 
-class Hash {
-	private Show tabela[];
-	private int tamTab;
-	public int comparacoes = 0;
+class Celula {
+	public Show elemento;
+	public Celula prox;
 
-	public Hash() {
-		this.tamTab = 21;
-		this.tabela = new Show[this.tamTab];
+	public Celula(Show elemento) {
+		this.elemento = elemento;
+		this.prox = null;
+	}
+}
+
+class ListaSimples {
+	public Celula primeiro;
+	public Celula ultimo;
+
+	public ListaSimples() {
+		primeiro = ultimo = null;
 	}
 
-	public Hash(int tamTab, int tamReserva) {
+	public void inserirFim(Show s) {
+		Celula tmp = new Celula(s);
+		if (primeiro == null) {
+			primeiro = tmp;
+			ultimo = tmp;
+		}
+		else {
+			ultimo.prox = tmp;
+			ultimo = tmp;
+		}
+	}
+
+	public boolean pesquisar(String title) {
+		boolean encontrou = false;
+		Celula i = primeiro;
+		while (i != null) {
+			comparacoes += 2;
+			if (i.elemento.getTitle().equals(title)) {
+				encontrou = true;
+			}
+			i = i.prox;
+		}
+		return encontrou;
+	}
+}
+
+class HashIndireta {
+	private ListaSimples tabela[];
+	private int tamTab;
+	public int comparacoes;
+
+	public HashIndireta() {
+		this.tamTab = 21;
+		this.tabela = new ListaSimples[this.tamTab];
+		for (int i = 0; i < tamTab; i++) {
+			tabela[i] = new ListaSimples();
+		}
+		this.totalComparacoes = 0;
+	}
+
+	public HashIndireta(int tamTab) {
 		this.tamTab = tamTab;
-		this.tabela = new Show[this.tamTab];
+		this.tabela = new ListaSimples[this.tamTab];
+		for (int i = 0; i < tamTab; i++) {
+			tabela[i] = new ListaSimples();
+		}
+		this.totalComparacoes = 0;
 	}
 
 	public int ASCII_title(String str) {
@@ -94,18 +146,7 @@ class Hash {
 	public void inserir(Show s) {
 		int x = ASCII_title(s.getTitle());
 		int pos = hash(x);
-
-		comparacoes++;
-		if (tabela[pos] == null) {
-			tabela[pos] = s;
-		}
-		else {
-			pos = rehash(x);
-			if (tabela[pos] == null) {
-				tabela[pos] = s;
-			}
-			comparacoes++;
-		}
+		tabela[pos].inserirFim(s);
 	}
 
 	public boolean pesquisar(String line) {
@@ -114,28 +155,13 @@ class Hash {
 		int pos = hash(x);
 		
 		System.out.print(" (Posicao: " + pos + ") ");
-		if (tabela[pos] != null && tabela[pos].getTitle().compareToIgnoreCase(line) == 0) {
+		if (tabela[pos].pesquisar(line)) {
 			encontrou = true;
 		}
-		else {
-			pos = rehash(x);
-			comparacoes++;
-			if (tabela[pos].getTitle().compareToIgnoreCase(line) == 0) {
-				encontrou = true;
-			}
-		}		
 
 		comparacoes++;
 
 		return encontrou;
-	}
-}
-
-class Lista {
-	public String title;
-
-	public Lista() {
-
 	}
 }
 
@@ -154,7 +180,7 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private static String arq = "/tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
     private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
