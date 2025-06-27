@@ -50,7 +50,7 @@ public class Main {
         double tempo = (end - start) / 1e6; // em milissegundos
 
 	try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, hash.comparacoes, tempo));
+            bw.write(String.format("%s\t%d\t%.2f\n", matricula, hash.comparacoes, tempo));
         }
         catch(Exception e) {}
 
@@ -146,7 +146,7 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private static String arq = "/tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
     private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
