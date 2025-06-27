@@ -50,7 +50,7 @@ public class Main {
         double tempo = (end - start) / 1e6; // em milissegundos
 
 	try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, hash.comparacoes, tempo));
+            bw.write(String.format("%s\t%d\t%.2f\n", matricula, hash.comparacoes, tempo));
         }
         catch(Exception e) {}
 
