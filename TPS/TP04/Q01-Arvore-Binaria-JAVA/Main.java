@@ -50,9 +50,13 @@ public class Main {
         double tempo = (end - start) / 1e6; // em milissegundos
 
 	try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, arvore.comparacoes, tempo));
+            bw.write(String.format("%d\t%d\t%.2f\n",
+                                  matricula,
+                                  arvore.getComparacoes(),
+                                  tempo));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch(Exception e) {}
 
         sc.close();
     }
@@ -101,10 +105,11 @@ class No {
 
 class Arvore {
     private No raiz;
-    public static int comparacoes = 0;
+    public int comparacoes;
 
     public Arvore() {
 	    this.raiz = null;
+	    comparacoes = 0;
     }
 
     private No inserir(No i, Show s) {
@@ -155,6 +160,10 @@ class Arvore {
 	    System.out.print("=>raiz  ");
 	    return pesquisar(raiz, line);
     }
+
+    public int getComparacoes() {
+	    return this.comparacoes;
+    }
 }
 
 class Show {
@@ -172,7 +181,7 @@ class Show {
     private String listed_in[];
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH); // Formato da data
-    private static String arq = "../tmp/disneyplus.csv"; // Caminho do arquivo CSV
+    private static String arq = "/tmp/disneyplus.csv"; // Caminho do arquivo CSV
     private static List<String> csv = new ArrayList<>(); // Lista para armazenar as linhas do CSV
     
     // Método para obter o caminho do arquivo CSV
