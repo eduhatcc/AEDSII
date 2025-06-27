@@ -50,9 +50,10 @@ public class Main {
         double tempo = (end - start) / 1e6; // em milissegundos
 
 	try (BufferedWriter bw = new BufferedWriter(new FileWriter(log))) {
-            bw.write(String.format("%s\t%d\t%d\t%.2f\n", matricula, alvinegra.comparacoes, tempo));
+            bw.write(String.format("%d\t%d\t%.2f\n", matricula, alvinegra.getComparacoes(), tempo));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch(Exception e) {}
 
         sc.close();
     }
@@ -120,11 +121,15 @@ class No {
 
 class Alvinegra {
     private No raiz;
-    public static int comparacoes;
+    public int comparacoes;
 
     public Alvinegra() {
 	    this.raiz = null;
 	    comparacoes = 0;
+    }
+
+    public int getComparacoes() {
+	    return this.comparacoes;
     }
 
     private No inserir(No i, Show s) {
